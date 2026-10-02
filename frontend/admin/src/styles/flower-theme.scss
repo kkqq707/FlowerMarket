@@ -1,0 +1,23 @@
+:root {
+  --el-color-primary: #35402f;
+  --el-color-primary-light-3: #697362;
+  --el-color-primary-light-5: #92998d;
+  --el-color-primary-light-7: #bbc0b7;
+  --el-color-primary-light-8: #d4d7d1;
+  --el-color-primary-light-9: #eef0ec;
+  --el-color-primary-dark-2: #2a3326;
+  --el-color-danger: #ed3c2d;
+  --flower-forest: #35402f;
+  --flower-deep: #243129;
+  --flower-warm: #f7f4ec;
+  --flower-paper: #fffefa;
+  --flower-accent: #ed3c2d;
+}
+
+body { background: var(--flower-warm); color: var(--flower-deep); }
+.app-main { background: var(--flower-warm) !important; }
+.sidebar-container { background: var(--flower-deep) !important; }
+.el-card { border-color: rgba(53, 64, 47, .09); border-radius: 10px; }
+.el-button--primary { --el-button-bg-color: var(--flower-forest); --el-button-border-color: var(--flower-forest); }
+.el-table th.el-table__cell { background: #f2f0e9; color: var(--flower-deep); }
+.flower-section-title { margin: 2px 0 20px; font-family: STSong, SimSun, serif; font-size: 20px; color: var(--flower-deep); }

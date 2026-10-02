@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerMaterialBatchDao">
+  <select id="eligibleForUpdate" resultType="com.zbkj.common.model.flower.FlowerMaterialBatch">
+    SELECT * FROM eb_flower_material_batch
+    WHERE material_id=#{materialId} AND expiry_date &gt;= DATE(#{deliveryDate})
+      AND received_date &lt;= CURDATE()
+      AND current_qty &gt; reserved_qty
+    ORDER BY expiry_date ASC, received_date ASC, id ASC FOR UPDATE
+  </select>
+  <update id="reserve">
+    UPDATE eb_flower_material_batch SET reserved_qty=reserved_qty+#{quantity}, update_time=NOW()
+    WHERE id=#{batchId} AND #{quantity} &gt; 0 AND current_qty-reserved_qty &gt;= #{quantity}
+  </update>
+  <update id="release">
+    UPDATE eb_flower_material_batch SET reserved_qty=reserved_qty-#{quantity}, update_time=NOW()
+    WHERE id=#{batchId} AND #{quantity} &gt; 0 AND reserved_qty &gt;= #{quantity}
+  </update>
+  <update id="consume">
+    UPDATE eb_flower_material_batch SET current_qty=current_qty-#{quantity},
+      reserved_qty=reserved_qty-#{quantity}, update_time=NOW()
+    WHERE id=#{batchId} AND #{quantity} &gt; 0 AND reserved_qty &gt;= #{quantity}
+      AND current_qty &gt;= #{quantity}
+  </update>
+  <update id="adjustCurrent">
+    UPDATE eb_flower_material_batch SET current_qty=#{currentQty}, update_time=NOW()
+    WHERE id=#{batchId} AND #{currentQty} &gt;= 0 AND #{currentQty} &gt;= reserved_qty
+  </update>
+</mapper>

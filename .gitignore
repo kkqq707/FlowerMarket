@@ -1,0 +1,28 @@
+.idea/
+.claude/
+frontend/uni-app/unpackage
+Crmeb-2022-01-04.log
+crmeb_front_log
+backend/LOG_HOME_IS_UNDEFINED
+*.
+*.
+.DS_Store
+
+# Local build output and dependencies
+**/target/
+**/node_modules/
+**/dist/
+**/unpackage/
+**/*.log
+
+# Local configuration and database snapshots
+**/application*.yml
+!**/application*.example.yml
+**/.env.local
+**/.env.*.local
+backend/sql/backups/
+
+# Local assistant work and generated previews
+.crmeb/
+.impeccable/
+.superpowers/

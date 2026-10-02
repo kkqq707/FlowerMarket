@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerDashboardDao">
+    <select id="selectOrderMetrics" resultType="com.zbkj.common.response.FlowerDashboardResponse$OrderMetric">
+        SELECT o.pay_price, o.refund_status, e.current_stage,
+               TIMESTAMP(s.delivery_date, s.end_time) AS promised_time,
+               (SELECT MAX(p.create_time) FROM eb_flower_order_progress p
+                WHERE p.order_id = o.order_id AND p.stage = 'COMPLETED') AS completed_time
+        FROM eb_store_order o
+        INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
+        LEFT JOIN eb_flower_delivery_slot s ON s.id = e.slot_id
+        WHERE o.paid = 1 AND o.is_del = 0 AND o.is_system_del = 0
+          AND o.pay_time &gt;= #{start} AND o.pay_time &lt; #{end}
+    </select>
+    <select id="countAfterSales" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM eb_store_order o
+        INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
+        WHERE o.refund_status IN (1, 3) AND o.is_del = 0 AND o.is_system_del = 0
+    </select>
+    <select id="selectSalesTrend" resultType="com.zbkj.common.response.FlowerDashboardResponse$TrendItem">
+        SELECT DATE_FORMAT(o.pay_time, '%m-%d') AS label,
+               SUM(o.pay_price) AS amount, COUNT(1) AS order_count
+        FROM eb_store_order o INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
+        WHERE o.paid = 1 AND o.refund_status = 0 AND o.is_del = 0 AND o.is_system_del = 0
+          AND o.pay_time &gt;= #{start} AND o.pay_time &lt; #{end}
+        GROUP BY DATE_FORMAT(o.pay_time, '%m-%d') ORDER BY MIN(o.pay_time)
+    </select>
+    <select id="selectHotProducts" resultType="com.zbkj.common.response.FlowerDashboardResponse$RankingItem">
+        SELECT i.product_id, i.product_name AS name, i.image,
+               SUM(i.pay_num) AS quantity, SUM(i.price * i.pay_num) AS amount
+        FROM eb_store_order_info i
+        INNER JOIN eb_store_order o ON o.id = i.order_id
+        INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
+        WHERE o.paid = 1 AND o.refund_status = 0 AND o.is_del = 0 AND o.is_system_del = 0
+          AND o.pay_time &gt;= #{start} AND o.pay_time &lt; #{end}
+        GROUP BY i.product_id, i.product_name, i.image ORDER BY quantity DESC LIMIT 5
+    </select>
+    <select id="selectPopularSlots" resultType="com.zbkj.common.response.FlowerDashboardResponse$SlotItem">
+        SELECT CONCAT(DATE_FORMAT(s.start_time, '%H:%i'), '-', DATE_FORMAT(s.end_time, '%H:%i')) AS label,
+               COUNT(1) AS order_count
+        FROM eb_flower_order_ext e INNER JOIN eb_flower_delivery_slot s ON s.id = e.slot_id
+        INNER JOIN eb_store_order o ON o.order_id = e.order_id
+        WHERE o.paid = 1 AND o.refund_status = 0 AND o.is_del = 0 AND o.is_system_del = 0
+          AND o.pay_time &gt;= #{start} AND o.pay_time &lt; #{end}
+        GROUP BY s.start_time, s.end_time ORDER BY order_count DESC LIMIT 5
+    </select>
+</mapper>

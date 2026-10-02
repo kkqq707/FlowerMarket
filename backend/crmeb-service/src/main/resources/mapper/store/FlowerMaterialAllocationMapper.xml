@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerMaterialAllocationDao">
+  <select id="selectByOrderForUpdate" resultType="com.zbkj.common.model.flower.FlowerMaterialAllocation">
+    SELECT * FROM eb_flower_material_allocation WHERE order_id=#{orderNo} ORDER BY id FOR UPDATE
+  </select>
+  <update id="changeStatus">
+    UPDATE eb_flower_material_allocation SET status=#{to}, update_time=NOW()
+    WHERE id=#{id} AND status=#{from}
+  </update>
+</mapper>

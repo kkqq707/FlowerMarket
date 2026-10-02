@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerOrderExtDao">
+    <select id="selectByOrderId" resultType="com.zbkj.common.model.flower.FlowerOrderExt">
+        SELECT * FROM eb_flower_order_ext WHERE order_id = #{orderId} LIMIT 1
+    </select>
+    <select id="selectByOrderIdForUpdate" resultType="com.zbkj.common.model.flower.FlowerOrderExt">
+        SELECT * FROM eb_flower_order_ext WHERE order_id = #{orderId} LIMIT 1 FOR UPDATE
+    </select>
+    <update id="updateStage">
+        UPDATE eb_flower_order_ext
+        SET current_stage = #{targetStage},
+            courier_name = CASE WHEN #{courierName} IS NULL THEN courier_name ELSE #{courierName} END,
+            courier_phone = CASE WHEN #{courierPhone} IS NULL THEN courier_phone ELSE #{courierPhone} END,
+            delivery_remark = CASE WHEN #{deliveryRemark} IS NULL THEN delivery_remark ELSE #{deliveryRemark} END,
+            update_time = NOW()
+        WHERE order_id = #{orderId}
+    </update>
+    <select id="findExpiredReservations" resultType="com.zbkj.common.model.flower.FlowerOrderExt">
+        SELECT ext.*
+        FROM eb_flower_order_ext ext
+        INNER JOIN eb_store_order original_order ON original_order.order_id = ext.order_id
+        WHERE ext.current_stage = 'WAIT_PAY'
+          AND (original_order.paid = 0 OR original_order.paid IS NULL)
+          AND ext.reservation_expire_time &lt; #{now}
+          AND ext.reservation_released = 0
+        ORDER BY ext.reservation_expire_time ASC, ext.id ASC
+    </select>
+    <update id="markReservationReleased">
+        UPDATE eb_flower_order_ext
+        SET reservation_released = 1, update_time = NOW()
+        WHERE order_id = #{orderId} AND reservation_released = 0
+    </update>
+    <update id="markPaidStage">
+        UPDATE eb_flower_order_ext
+        SET current_stage = 'WAIT_ACCEPT', update_time = NOW()
+        WHERE order_id = #{orderId} AND current_stage = 'WAIT_PAY'
+    </update>
+    <select id="selectAdminList" resultType="com.zbkj.common.response.FlowerOrderAdminListResponse">
+        SELECT ext.order_id AS order_no,
+               ext.current_stage,
+               ext.recipient_name,
+               ext.recipient_phone,
+               ext.delivery_address_snapshot AS delivery_address,
+               ext.delivery_date,
+               ext.slot_id,
+               original_order.pay_price,
+               original_order.total_num,
+               original_order.paid,
+               original_order.refund_status,
+               original_order.create_time
+        FROM eb_flower_order_ext ext
+        INNER JOIN eb_store_order original_order ON original_order.order_id = ext.order_id
+        WHERE original_order.is_system_del = 0
+        <if test="stage != null and stage != ''">
+            AND ext.current_stage = #{stage}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (ext.order_id LIKE CONCAT('%', #{keyword}, '%')
+                 OR ext.recipient_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR ext.recipient_phone LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY ext.delivery_date ASC, original_order.create_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerDeliverySlotDao">
+    <update id="reserve">
+        UPDATE eb_flower_delivery_slot
+        SET booked_count = booked_count + 1,
+            version = version + 1,
+            update_time = NOW()
+        WHERE id = #{slotId}
+          AND enabled = 1
+          AND cutoff_time &gt; NOW()
+          AND booked_count &lt; capacity
+    </update>
+
+    <update id="release">
+        UPDATE eb_flower_delivery_slot
+        SET booked_count = booked_count - 1,
+            version = version + 1,
+            update_time = NOW()
+        WHERE id = #{slotId}
+          AND booked_count &gt; 0
+    </update>
+
+    <select id="findAvailable" resultType="com.zbkj.common.model.flower.FlowerDeliverySlot">
+        SELECT *
+        FROM eb_flower_delivery_slot
+        WHERE delivery_date BETWEEN #{startDate} AND #{endDate}
+          AND enabled = 1
+          AND cutoff_time &gt; NOW()
+          AND booked_count &lt; capacity
+        ORDER BY delivery_date ASC, start_time ASC
+    </select>
+
+    <update id="updateAdminFields">
+        UPDATE eb_flower_delivery_slot
+        SET delivery_date = #{slot.deliveryDate}, start_time = #{slot.startTime},
+            end_time = #{slot.endTime}, capacity = #{slot.capacity},
+            cutoff_time = #{slot.cutoffTime}, enabled = #{slot.enabled},
+            version = version + 1, update_time = NOW()
+        WHERE id = #{slot.id} AND booked_count &lt;= #{slot.capacity}
+    </update>
+
+    <update id="updateEnabled">
+        UPDATE eb_flower_delivery_slot
+        SET enabled = #{enabled}, version = version + 1, update_time = NOW()
+        WHERE id = #{slotId}
+    </update>
+</mapper>

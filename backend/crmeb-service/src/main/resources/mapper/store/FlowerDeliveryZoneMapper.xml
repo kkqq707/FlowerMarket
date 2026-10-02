@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerDeliveryZoneDao">
+    <select id="findEnabledByAreaCode" resultType="com.zbkj.common.model.flower.FlowerDeliveryZone">
+        SELECT *
+        FROM eb_flower_delivery_zone
+        WHERE enabled = 1
+          AND FIND_IN_SET(#{areaCode}, REPLACE(area_codes, ' ', ''))
+        ORDER BY id ASC
+        LIMIT 1
+    </select>
+</mapper>

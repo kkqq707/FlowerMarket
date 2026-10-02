@@ -1,0 +1,27 @@
+$flower-primary: #35402F;
+$flower-deep: #243129;
+$flower-background: #F7F4EC;
+$flower-paper: #FFFEFA;
+$flower-text: #2D312C;
+$flower-accent: #ED3C2D;
+$flower-serif-cn: "Songti SC", "SimSun", serif;
+$flower-serif-en: Georgia, "Times New Roman", serif;
+
+:root {
+	--flower-primary: #{$flower-primary};
+	--flower-deep: #{$flower-deep};
+	--flower-background: #{$flower-background};
+	--flower-paper: #{$flower-paper};
+	--flower-text: #{$flower-text};
+	--flower-accent: #{$flower-accent};
+	--flower-serif-cn: #{$flower-serif-cn};
+	--flower-serif-en: #{$flower-serif-en};
+	--view-theme: #{$flower-primary};
+	--view-theme-16: #{$flower-primary};
+	--view-priceColor: #{$flower-accent};
+	--view-minorColor: #{$flower-primary};
+	--view-bntColor: #{$flower-primary};
+	--view-main-start: #{$flower-primary};
+	--view-main-over: #{$flower-primary};
+	--view-gradient: #{$flower-primary};
+}

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerProductExtDao">
+    <select id="searchOnSale" resultType="com.zbkj.common.response.flower.FlowerProductCardResponse">
+        SELECT p.id,
+               p.image,
+               p.store_name,
+               p.store_info,
+               p.price,
+               p.ot_price AS original_price,
+               (IFNULL(p.sales, 0) + IFNULL(p.ficti, 0)) AS sales,
+               p.stock,
+               p.is_show,
+               e.flower_materials,
+               e.flower_language,
+               e.occasion,
+               e.recipient,
+               e.color_series
+        FROM eb_store_product p
+        INNER JOIN eb_flower_product_ext e ON e.product_id = p.id
+        WHERE p.is_show = 1
+          AND p.is_del = 0
+          AND p.is_recycle = 0
+        <if test="request.keyword != null and request.keyword != ''">
+            AND p.store_name LIKE CONCAT('%', #{request.keyword}, '%')
+        </if>
+        <if test="request.occasion != null and request.occasion != ''">
+            AND FIND_IN_SET(#{request.occasion}, e.occasion)
+        </if>
+        <if test="request.recipient != null and request.recipient != ''">
+            AND FIND_IN_SET(#{request.recipient}, e.recipient)
+        </if>
+        <if test="request.colorSeries != null and request.colorSeries != ''">
+            AND FIND_IN_SET(#{request.colorSeries}, e.color_series)
+        </if>
+        <if test="request.minPrice != null">
+            AND p.price &gt;= #{request.minPrice}
+        </if>
+        <if test="request.maxPrice != null">
+            AND p.price &lt;= #{request.maxPrice}
+        </if>
+        ORDER BY p.sort DESC, p.id DESC
+    </select>
+    <select id="searchAdmin" resultType="com.zbkj.common.response.flower.FlowerProductCardResponse">
+        SELECT p.id, p.image, p.store_name, p.store_info, p.price,
+               p.ot_price AS original_price,
+               (IFNULL(p.sales, 0) + IFNULL(p.ficti, 0)) AS sales,
+               p.stock, p.is_show,
+               e.flower_materials, e.flower_language, e.occasion, e.recipient, e.color_series
+        FROM eb_store_product p
+        INNER JOIN eb_flower_product_ext e ON e.product_id = p.id
+        WHERE p.is_del = 0 AND p.is_recycle = 0
+        <if test="request.keyword != null and request.keyword != ''">
+            AND p.store_name LIKE CONCAT('%', #{request.keyword}, '%')
+        </if>
+        <if test="request.occasion != null and request.occasion != ''">
+            AND FIND_IN_SET(#{request.occasion}, e.occasion)
+        </if>
+        <if test="request.recipient != null and request.recipient != ''">
+            AND FIND_IN_SET(#{request.recipient}, e.recipient)
+        </if>
+        <if test="request.colorSeries != null and request.colorSeries != ''">
+            AND FIND_IN_SET(#{request.colorSeries}, e.color_series)
+        </if>
+        ORDER BY p.sort DESC, p.id DESC
+    </select>
+    <select id="countByProductIds" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM eb_flower_product_ext
+        WHERE product_id IN
+        <foreach collection="productIds" item="productId" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </select>
+</mapper>

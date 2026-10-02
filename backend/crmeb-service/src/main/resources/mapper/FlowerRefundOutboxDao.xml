@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbkj.service.dao.FlowerRefundOutboxDao">
+    <insert id="insertPending">
+        INSERT INTO eb_flower_refund_outbox (order_id, status, create_time, update_time)
+        VALUES (#{orderId}, 0, NOW(), NOW())
+    </insert>
+    <select id="findPendingIds" resultType="java.lang.Integer">
+        SELECT id FROM eb_flower_refund_outbox
+        WHERE status = 0
+        ORDER BY id ASC
+        LIMIT #{limit}
+    </select>
+    <select id="selectForUpdate" resultType="com.zbkj.common.model.flower.FlowerRefundOutbox">
+        SELECT * FROM eb_flower_refund_outbox WHERE id = #{id} FOR UPDATE
+    </select>
+    <update id="markDone">
+        UPDATE eb_flower_refund_outbox
+        SET status = 1, update_time = NOW()
+        WHERE id = #{id} AND status = 0
+    </update>
+</mapper>
