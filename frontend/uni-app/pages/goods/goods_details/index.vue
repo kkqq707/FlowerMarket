@@ -33,7 +33,7 @@
             <text class="flower-poem__text">{{ flowerInfo.flowerLanguage || productInfo.flowerLanguage || '让鲜花替你传递心意。' }}</text>
             <image class="flower-poem__sprig" :src="'/static/images/flower-detail/meaning-sprig.png'" mode="aspectFit" aria-hidden="true" />
           </view>
-          <view class="flower-meta"><text>{{ isDemo ? '演示价格' : '已售 ' + (Number(productInfo.sales) || 0) + ' 件' }}</text><view v-if="!isDemo" class="flower-meta__divider" aria-hidden="true"></view><text v-if="!isDemo">商品库存 {{ attr.productSelect.stock || productInfo.stock || 0 }}</text></view>
+          <view class="flower-meta"><text>{{ isDemo ? '演示价格' : '已售 ' + detailMetrics.sales + ' 件' }}</text><view v-if="!isDemo" class="flower-meta__divider" aria-hidden="true"></view><text v-if="!isDemo">商品库存 {{ detailMetrics.stock }}</text></view>
         </view>
         <view class="flower-info-list">
           <button class="flower-spec" @click="selecAttr">
@@ -280,6 +280,7 @@
 	const productInfo = ref({}); //商品详情
 	const isDemo = ref(false), detailError = ref(''), flowerInfo = ref({}), flowerRecommendations = ref([]), failedImages = ref([]);
   const flowerPriceParts = computed(() => flowerView.splitFlowerPrice(attr.productSelect.price ?? productInfo.value.price));
+  const detailMetrics = computed(() => flowerView.flowerDetailMetrics(productInfo.value, attr.productSelect));
   const canPurchase = computed(() => !isDemo.value && !detailError.value && !showSkeleton.value && Number(attr.productSelect.stock) > 0);
   const galleryImages = computed(() => {
     const images = sliderImage.value.length ? sliderImage.value : [productInfo.value.image || flowerView.FLOWER_IMAGE_FALLBACK];
@@ -465,7 +466,7 @@
 			price: productSelect.price || pInfo.price || 0,
 			real_price: productSelect.price || pInfo.price || 0,
 			ot_price: productSelect.otPrice || pInfo.otPrice || 0,
-			stock: productSelect.stock || pInfo.stock || 0,
+			stock: productSelect.stock ?? pInfo.stock ?? 0,
 			unit_name: pInfo.unitName || '',
 		};
 	});
@@ -1561,8 +1562,14 @@
 	};
 
 	// --- Lifecycle Hooks ---
+	let detailShown = false;
 	onShow(() => {
 		loadUserRelatedData();
+		if (detailShown && id.value && !isDemo.value) {
+			getGoodsDetails();
+			getFlowerDetail(id.value).then(res => { flowerInfo.value = res.data || {}; }).catch(() => {});
+		}
+		detailShown = true;
 	});
 
 	onLoad((options) => {

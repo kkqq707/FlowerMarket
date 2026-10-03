@@ -31,13 +31,20 @@ function formatFlowerSales(value) {
   return `已售 ${Math.floor(toNonNegativeNumber(value))} 件`;
 }
 
+function flowerDetailMetrics(product = {}, selectedSku = {}) {
+  return {
+    stock: Math.floor(toNonNegativeNumber(selectedSku.stock ?? product.stock)),
+    sales: Math.floor(toNonNegativeNumber(product.sales)) + Math.floor(toNonNegativeNumber(product.ficti)),
+  };
+}
+
 function resolveFlowerImage(value) {
   if (Array.isArray(value)) return resolveFlowerImage(value[0]);
   return typeof value === 'string' && value.trim() ? value.trim() : FLOWER_IMAGE_FALLBACK;
 }
 
 function buildFlowerProductView(product = {}) {
-  const title = firstText(product.store_name, product.name, product.title) || '花礼';
+  const title = firstText(product.store_name, product.storeName, product.name, product.title) || '花礼';
   const priceParts = splitFlowerPrice(product.price ?? product.ot_price);
 
   return {
@@ -60,6 +67,7 @@ export {
   buildFlowerProductView,
   formatFlowerPrice,
   formatFlowerSales,
+  flowerDetailMetrics,
   resolveFlowerImage,
   splitFlowerPrice,
 };
@@ -69,6 +77,7 @@ export default {
   buildFlowerProductView,
   formatFlowerPrice,
   formatFlowerSales,
+  flowerDetailMetrics,
   resolveFlowerImage,
   splitFlowerPrice,
 };

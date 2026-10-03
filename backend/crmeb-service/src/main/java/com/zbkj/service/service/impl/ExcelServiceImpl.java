@@ -7,6 +7,8 @@ import com.zbkj.common.page.CommonPage;
 import com.zbkj.common.constants.Constants;
 import com.zbkj.common.exception.CrmebException;
 import com.zbkj.common.request.*;
+import com.zbkj.common.request.flower.FlowerProductSearchRequest;
+import com.zbkj.common.response.flower.FlowerProductCardResponse;
 import com.zbkj.common.response.StoreOrderDetailResponse;
 import com.zbkj.common.response.StoreProductResponse;
 import com.github.pagehelper.PageInfo;
@@ -47,6 +49,9 @@ public class ExcelServiceImpl implements ExcelService {
 
     @Autowired
     private StoreProductService storeProductService;
+
+    @Autowired
+    private FlowerProductService flowerProductService;
 
     @Autowired
     private CategoryService categoryService;
@@ -217,6 +222,43 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("browse", "浏览量");
 
         return ExportUtil.exportExecl(fileName, "商品导出", voList, aliasMap);
+    }
+
+    @Override
+    public String exportFlowerProduct(FlowerProductSearchRequest request) {
+        FlowerProductSearchRequest criteria = new FlowerProductSearchRequest();
+        if (request != null) BeanUtils.copyProperties(request, criteria);
+        criteria.setPage(Constants.DEFAULT_PAGE);
+        criteria.setLimit(Constants.EXPORT_MAX_LIMIT);
+        List<FlowerProductCardResponse> products = flowerProductService.searchAdmin(criteria);
+        if (products.isEmpty()) throw new CrmebException("没有可导出的数据！");
+        List<LinkedHashMap<String, Object>> rows = products.stream().map(product -> {
+            LinkedHashMap<String, Object> row = new LinkedHashMap<>();
+            row.put("id", product.getId());
+            row.put("storeName", product.getStoreName());
+            row.put("price", product.getPrice());
+            row.put("stock", product.getStock());
+            row.put("sales", product.getSales());
+            row.put("flowerMaterials", product.getFlowerMaterials());
+            row.put("occasion", product.getOccasion());
+            row.put("recipient", product.getRecipient());
+            row.put("colorSeries", product.getColorSeries());
+            return row;
+        }).collect(Collectors.toList());
+        LinkedHashMap<String, String> aliases = new LinkedHashMap<>();
+        aliases.put("id", "商品ID");
+        aliases.put("storeName", "商品名称");
+        aliases.put("price", "商品售价");
+        aliases.put("stock", "库存");
+        aliases.put("sales", "销量");
+        aliases.put("flowerMaterials", "主要花材");
+        aliases.put("occasion", "适用场景");
+        aliases.put("recipient", "赠送对象");
+        aliases.put("colorSeries", "色系");
+        ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, UploadConstants.DOWNLOAD_FILE_KEYWORD);
+        String fileName = "花礼商品导出_" + CrmebDateUtil.nowDateTime(Constants.DATE_TIME_FORMAT_NUM)
+                + CrmebUtil.randomCount(111111111, 999999999) + ".xlsx";
+        return ExportUtil.exportExecl(fileName, "花礼商品导出", rows, aliases);
     }
 
     /**

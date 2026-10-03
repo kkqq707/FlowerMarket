@@ -53,6 +53,7 @@ INSERT INTO `eb_system_role_menu` (`rid`,`menu_id`) VALUES
 -- 二、商品只保留花卉。历史订单引用的商品不会被清理。
 UPDATE `eb_store_product` SET `is_del`=1, `is_show`=0
 WHERE `id` NOT BETWEEN 900001 AND 900012
+  AND NOT EXISTS (SELECT 1 FROM `eb_flower_product_ext` `flower` WHERE `flower`.`product_id`=`eb_store_product`.`id`)
   AND `is_del`=0
   AND NOT EXISTS (
     SELECT 1 FROM `eb_store_order_info` `oi` WHERE `oi`.`product_id`=`eb_store_product`.`id`

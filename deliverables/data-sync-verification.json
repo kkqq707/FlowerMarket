@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-03T03:25:36.239Z",
+  "products": 36,
+  "categories": 9,
+  "filterValues": 23,
+  "checks": 641,
+  "result": "passed",
+  "coverage": [
+    "list/detail/SKU price and stock",
+    "displayed sales including configured virtual sales",
+    "actual filter metadata and exact matches",
+    "category filters",
+    "material keyword search",
+    "budget filters",
+    "empty results"
+  ]
+}

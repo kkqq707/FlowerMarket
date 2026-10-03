@@ -370,7 +370,6 @@ const { colorStyle } = useColor();
 
 const cartCount = ref(0);
 const flowerRecommendations = ref([]);
-const flowerRecommendationsLoaded = ref(false);
 const goodsHidden = ref(false);
 const footerswitch = ref(true);
 const hostProduct = ref([]);
@@ -473,8 +472,6 @@ function goGoodsDetails(productId) {
 }
 
 async function loadFlowerRecommendations() {
-  if (flowerRecommendationsLoaded.value) return;
-  flowerRecommendationsLoaded.value = true;
   try {
     const response = await getFlowerProducts({ page: 1, limit: 6 });
     flowerRecommendations.value = flowerCartRecommendationsFromResponse(response);

@@ -6,6 +6,7 @@ import com.zbkj.common.model.flower.FlowerProductExt;
 import com.zbkj.common.request.flower.FlowerProductExtRequest;
 import com.zbkj.common.response.flower.FlowerProductDetailResponse;
 import com.zbkj.common.response.flower.FlowerProductCardResponse;
+import com.zbkj.common.response.StoreProductTabsHeader;
 import com.zbkj.common.request.flower.FlowerProductSearchRequest;
 import com.zbkj.common.page.CommonPage;
 import com.zbkj.common.result.CommonResult;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/admin/flower/product")
@@ -24,6 +27,20 @@ public class FlowerProductController {
 
     @Autowired
     private FlowerProductService flowerProductService;
+
+    @PreAuthorize("hasAuthority('admin:product:tabs:headers')")
+    @ApiOperation(value = "按当前筛选条件统计鲜花商品状态数量")
+    @GetMapping("/tabs")
+    public CommonResult<List<StoreProductTabsHeader>> tabs(@Validated FlowerProductSearchRequest request) {
+        return CommonResult.success(flowerProductService.adminTabs(request));
+    }
+
+    @PreAuthorize("hasAuthority('admin:product:list')")
+    @ApiOperation(value = "读取花礼实际使用的筛选标签")
+    @GetMapping("/filters")
+    public CommonResult<Map<String, List<String>>> filters() {
+        return CommonResult.success(flowerProductService.filterOptions(false));
+    }
 
     @PreAuthorize("hasAuthority('admin:flower:product:info')")
     @ApiOperation(value = "查看鲜花商品资料")

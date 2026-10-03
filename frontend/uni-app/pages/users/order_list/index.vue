@@ -127,6 +127,7 @@ import { useColor } from '@/composables/useColor.js';
 	const orderData = ref({}); //订单详细统计
 	const orderStatus = ref(0); //订单状态
 	const page = ref(1);
+	let orderRequestVersion = 0;
 	const limit = ref(20);
 	const payMode = ref([{
 			name: "微信支付",
@@ -166,11 +167,8 @@ import { useColor } from '@/composables/useColor.js';
 
 	onShow(() => {
 		if (isLogin.value) {
-			loadend.value = false;
-			page.value = 1;
-			orderList.value = [];
 			getOrderData();
-			getOrderList();
+			statusClick(orderStatus.value);
 			payMode.value[1].number = userInfo.value && userInfo.value.nowMoney || 0;
 			payMode.value = payMode.value;
 		} else {
@@ -345,6 +343,8 @@ import { useColor } from '@/composables/useColor.js';
 	 * 切换类型
 	 */
 	function statusClick(status) {
+		orderRequestVersion++;
+		loading.value = false;
 		orderStatus.value = status;
 		loadend.value = false;
 		page.value = 1;
@@ -358,13 +358,15 @@ import { useColor } from '@/composables/useColor.js';
 		if (loadend.value) return;
 		if (loading.value) return;
 		loading.value = true;
+		const requestVersion = orderRequestVersion;
 		loadTitle.value = "加载更多";
 		getOrderListApi({
 			type: orderStatus.value,
 			page: page.value,
 			limit: limit.value,
-			keywords:encodeURIComponent(keywords.value)
+			keywords:keywords.value.trim()
 		}).then(res => {
+			if (requestVersion !== orderRequestVersion) return;
 			let list = res.data.list || [];
 			let loadendVal = list.length < limit.value;
 			orderList.value = proxy.$util.SplitArray(list, orderList.value);
@@ -375,6 +377,7 @@ import { useColor } from '@/composables/useColor.js';
 			page.value = page.value + 1;
 			isShow.value = true;
 		}).catch(err => {
+			if (requestVersion !== orderRequestVersion) return;
 			loading.value = false;
 			loadTitle.value = "加载更多";
 		})

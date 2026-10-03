@@ -41,6 +41,13 @@ test('normalizes Java camelCase and paginated flower products for reusable cards
   assert.equal(Object.hasOwn(item, 'store_name'), false);
 });
 
+test('catalog filters preserve backend tag values rather than substitute frontend labels', async () => {
+  const { flowerFiltersFromResponse } = await loadFlowerStoreData();
+  const groups = flowerFiltersFromResponse({ data: { occasion: ['生日'], recipient: ['爱人', '客户'], colorSeries: ['白绿色', '奶油色', '白绿色'] } });
+  assert.deepEqual(groups.find(group => group.key === 'recipient').values, ['全部', '爱人', '客户']);
+  assert.deepEqual(groups.find(group => group.key === 'colorSeries').values, ['全部', '白绿色', '奶油色']);
+});
+
 test('demo flower filters combine keyword, occasion, recipient and color', async () => {
   const { filterFlowerDemo } = await loadFlowerStoreData();
   assert.deepEqual(filterFlowerDemo({keyword:'玫瑰',occasion:'生日',recipient:'恋人',colorSeries:'粉色'}).map(item => item.id), ['demo-04']);
@@ -73,8 +80,8 @@ test('provides twelve local demo flowers across four occasions', async () => {
   ));
 });
 
-test('cart recommendations prefer real flowers and fall back to the local flower catalogue', async () => {
-  const { flowerCartRecommendationsFromResponse, flowerDemoProducts } = await loadFlowerStoreData();
+test('cart recommendations never replace empty or unavailable server data with demo products', async () => {
+  const { flowerCartRecommendationsFromResponse } = await loadFlowerStoreData();
   const realFlowers = Array.from({ length: 8 }, (_, index) => ({
     id: index + 1,
     storeName: `鲜花 ${index + 1}`,
@@ -88,9 +95,16 @@ test('cart recommendations prefer real flowers and fall back to the local flower
   );
   assert.deepEqual(
     flowerCartRecommendationsFromResponse({ data: { list: [] } }).map(item => item.id),
-    flowerDemoProducts.slice(0, 6).map(item => item.id),
+    [],
   );
-  assert.ok(flowerCartRecommendationsFromResponse(null).every(item => item.demo));
+  assert.deepEqual(flowerCartRecommendationsFromResponse(null), []);
+});
+
+test('detail metrics retain zero SKU stock and use the same total sales as product cards', () => {
+  assert.equal(typeof productViewModule.flowerDetailMetrics, 'function');
+  const product = { stock: 99, sales: 32, ficti: 68 };
+  assert.deepEqual(productViewModule.flowerDetailMetrics(product, { stock: 0 }), { stock: 0, sales: 100 });
+  assert.deepEqual(productViewModule.flowerDetailMetrics(product, {}), { stock: 99, sales: 100 });
 });
 
 test('cart empty state only loads the flower catalogue', async () => {

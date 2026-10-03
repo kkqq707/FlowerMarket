@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zbkj.service.dao.FlowerProductExtDao">
+    <sql id="categoryAndKeyword">
+        <if test="request.cid != null and request.cid > 0">
+            AND EXISTS (SELECT 1 FROM eb_category c
+                WHERE c.type = 1 AND FIND_IN_SET(c.id, p.cate_id)
+                  AND (c.id = #{request.cid} OR c.path LIKE CONCAT('%/', #{request.cid}, '/%')))
+        </if>
+        <if test="request.keyword != null and request.keyword != ''">
+            AND (p.store_name LIKE CONCAT('%', #{request.keyword}, '%')
+                OR e.flower_materials LIKE CONCAT('%', #{request.keyword}, '%')
+                OR p.keyword LIKE CONCAT('%', #{request.keyword}, '%')
+                OR CAST(p.id AS CHAR) = #{request.keyword})
+        </if>
+    </sql>
+    <select id="filterSources" resultType="com.zbkj.common.response.flower.FlowerProductCardResponse">
+        SELECT e.occasion, e.recipient, e.color_series
+        FROM eb_store_product p INNER JOIN eb_flower_product_ext e ON e.product_id = p.id
+        WHERE p.is_del = 0 AND p.is_recycle = 0
+        <if test="onSale">AND p.is_show = 1</if>
+        ORDER BY p.sort DESC, p.id DESC
+    </select>
     <select id="searchOnSale" resultType="com.zbkj.common.response.flower.FlowerProductCardResponse">
         SELECT p.id,
                p.image,
@@ -21,9 +41,7 @@
         WHERE p.is_show = 1
           AND p.is_del = 0
           AND p.is_recycle = 0
-        <if test="request.keyword != null and request.keyword != ''">
-            AND p.store_name LIKE CONCAT('%', #{request.keyword}, '%')
-        </if>
+        <include refid="categoryAndKeyword"/>
         <if test="request.occasion != null and request.occasion != ''">
             AND FIND_IN_SET(#{request.occasion}, e.occasion)
         </if>
@@ -41,18 +59,19 @@
         </if>
         ORDER BY p.sort DESC, p.id DESC
     </select>
-    <select id="searchAdmin" resultType="com.zbkj.common.response.flower.FlowerProductCardResponse">
-        SELECT p.id, p.image, p.store_name, p.store_info, p.price,
-               p.ot_price AS original_price,
-               (IFNULL(p.sales, 0) + IFNULL(p.ficti, 0)) AS sales,
-               p.stock, p.is_show,
-               e.flower_materials, e.flower_language, e.occasion, e.recipient, e.color_series
-        FROM eb_store_product p
-        INNER JOIN eb_flower_product_ext e ON e.product_id = p.id
-        WHERE p.is_del = 0 AND p.is_recycle = 0
-        <if test="request.keyword != null and request.keyword != ''">
-            AND p.store_name LIKE CONCAT('%', #{request.keyword}, '%')
-        </if>
+    <sql id="adminConditions">
+        WHERE p.is_del = 0
+        <choose>
+            <when test="request.type != null and request.type == 5">AND p.is_recycle = 1</when>
+            <otherwise>AND p.is_recycle = 0</otherwise>
+        </choose>
+        <choose>
+            <when test="request.type != null and request.type == 1">AND p.is_show = 1</when>
+            <when test="request.type != null and request.type == 2">AND p.is_show = 0</when>
+            <when test="request.type != null and request.type == 3">AND p.stock &lt;= 0</when>
+            <when test="request.type != null and request.type == 4">AND p.stock &lt;= #{warningStock}</when>
+        </choose>
+        <include refid="categoryAndKeyword"/>
         <if test="request.occasion != null and request.occasion != ''">
             AND FIND_IN_SET(#{request.occasion}, e.occasion)
         </if>
@@ -62,6 +81,23 @@
         <if test="request.colorSeries != null and request.colorSeries != ''">
             AND FIND_IN_SET(#{request.colorSeries}, e.color_series)
         </if>
+        <if test="request.minPrice != null">AND p.price &gt;= #{request.minPrice}</if>
+        <if test="request.maxPrice != null">AND p.price &lt;= #{request.maxPrice}</if>
+    </sql>
+    <select id="countAdmin" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM eb_store_product p INNER JOIN eb_flower_product_ext e ON e.product_id = p.id
+        <include refid="adminConditions"/>
+    </select>
+    <select id="searchAdmin" resultType="com.zbkj.common.response.flower.FlowerProductCardResponse">
+        SELECT p.id, p.image, p.store_name, p.store_info, p.price,
+               p.ot_price AS original_price,
+               (IFNULL(p.sales, 0) + IFNULL(p.ficti, 0)) AS sales,
+               p.stock, p.is_show,
+               e.flower_materials, e.flower_language, e.occasion, e.recipient, e.color_series
+        FROM eb_store_product p
+        INNER JOIN eb_flower_product_ext e ON e.product_id = p.id
+        <include refid="adminConditions"/>
         ORDER BY p.sort DESC, p.id DESC
     </select>
     <select id="countByProductIds" resultType="java.lang.Integer">

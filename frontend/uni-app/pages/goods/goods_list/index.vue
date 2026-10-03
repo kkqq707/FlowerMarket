@@ -6,15 +6,14 @@
       <view v-for="group in flowerFilters" :key="group.key" class="filter-row"><text class="filter-label">{{ group.label }}</text><scroll-view scroll-x class="filter-scroll" :show-scrollbar="false"><button v-for="(value,index) in group.values" :key="value" :class="{active:selected[group.key] === index}" @click="setFilter(group.key,index)">{{ value }}</button></scroll-view></view>
     </view>
     <view class="results-heading"><text>{{ activeSummary }}</text><button @click="reset">重置筛选</button></view>
-    <view v-if="demo" class="data-note">演示内容 · 商品服务暂未连接，图片为花艺占位图。<button @click="search">重新连接</button></view>
-    <view v-if="error && !demo" class="data-note">{{ error }}<button @click="loadMore">重试</button></view>
+    <view v-if="error" class="data-note">{{ error }}<button @click="loadMore">重试</button></view>
     <view :class="categoryMode ? 'product-rows' : 'product-grid'">
       <template v-for="item in products" :key="item.id">
         <flower-product-row v-if="categoryMode" :product="item" @product-click="openProduct" @add-cart="chooseSku" />
         <flower-product-card v-else :product="item" @product-click="openProduct" @add-cart="chooseSku" />
       </template>
     </view>
-    <flower-empty v-if="!loading && !products.length" title="还没有符合心意的花礼" description="试试其他场景、颜色或预算，也可以重新搜索。" />
+    <flower-empty v-if="!loading && !error && !products.length" title="还没有符合心意的花礼" description="试试其他场景、颜色或预算，也可以重新搜索。" />
     <view class="loading">{{ loading ? '正在寻找花礼…' : (ended && products.length ? '花礼已全部呈现' : '') }}</view>
     <button v-if="!loading && !ended && products.length" class="load-more" @click="loadMore">查看更多花礼</button>
   </view>
@@ -25,15 +24,18 @@ import { onLoad, onShow, onReachBottom } from '@dcloudio/uni-app';
 import FlowerProductCard from '@/components/flower-product-card/index.vue';
 import FlowerProductRow from '@/components/flower-product-row/index.vue';
 import FlowerEmpty from '@/components/flower-empty/index.vue';
-import { getFlowerProducts, getProductslist, flowerProductsFromResponse, flowerFilters, flowerBudgets, filterFlowerDemo } from '@/api/store.js';
+import { getFlowerProducts, getFlowerFilterOptions, flowerProductsFromResponse, flowerFiltersFromResponse, flowerBudgets } from '@/api/store.js';
 const props=defineProps({categoryMode:{type:Boolean,default:false}});
-const keyword=ref(''),cid=ref(''),products=ref([]),loading=ref(false),ended=ref(false),demo=ref(false),error=ref(''),page=ref(1);
+const keyword=ref(''),cid=ref(''),products=ref([]),loading=ref(false),ended=ref(false),error=ref(''),page=ref(1);
 const selected=reactive({occasion:0,recipient:0,colorSeries:0,budget:0});
 let generation=0;
-const activeSummary=computed(()=>flowerFilters.map(group=>selected[group.key] ? group.values[selected[group.key]] : '').filter(Boolean).join(' · ') || '所有花礼');
+let entryOptions=null;
+const flowerFilters=ref(flowerFiltersFromResponse(null));
+const activeSummary=computed(()=>flowerFilters.value.map(group=>selected[group.key] ? group.values[selected[group.key]] : '').filter(Boolean).join(' · ') || '所有花礼');
 function query() {
   const data={keyword:keyword.value.trim(),page:page.value,limit:12,...flowerBudgets[selected.budget]};
-  flowerFilters.filter(group=>group.key!=='budget').forEach(group=>{if(selected[group.key])data[group.key]=group.values[selected[group.key]];});
+  if(cid.value)data.cid=cid.value;
+  flowerFilters.value.filter(group=>group.key!=='budget').forEach(group=>{if(selected[group.key])data[group.key]=group.values[selected[group.key]];});
   return data;
 }
 function setFilter(key,index){selected[key]=index;cid.value='';search();}
@@ -44,26 +46,37 @@ async function loadMore(){
   const current=generation;loading.value=true;error.value='';
   try {
     const data=query();
-    const response=cid.value ? await getProductslist({...data,cid:cid.value}) : await getFlowerProducts(data);
+    const response=await getFlowerProducts(data);
     if(current!==generation)return;
     const list=flowerProductsFromResponse(response);
-    demo.value=false;products.value=products.value.concat(list);ended.value=list.length<12;page.value++;
+    products.value=products.value.concat(list);ended.value=list.length<12;page.value++;
   }catch(err){
     if(current!==generation)return;
-    if(page.value===1) { demo.value=true;products.value=filterFlowerDemo(query());ended.value=true; }
-    else error.value=err.msg || '暂时无法加载更多花礼，请重试。';
+    error.value=err.msg || '花礼暂时无法加载，请重试。';
   }finally{if(current===generation)loading.value=false;}
 }
 function openProduct(item){uni.navigateTo({url:'/pages/goods/goods_details/index?id='+item.id});}
 function chooseSku(item){openProduct(item);}
 function init(options={}){
+  entryOptions=options;
   keyword.value=options.searchValue||options.keyword||'';cid.value=options.cid||'';
-  flowerFilters.forEach(group=>{if(options[group.key])selected[group.key]=group.key==='budget'?Math.min(4,Math.max(0,Number(options.budget)||0)):Math.max(0,group.values.indexOf(options[group.key]));});
-  loadMore();
+  flowerFilters.value.forEach(group=>{if(options[group.key])selected[group.key]=group.key==='budget'?Math.min(4,Math.max(0,Number(options.budget)||0)):Math.max(0,group.values.indexOf(options[group.key]));});
+}
+async function refreshCatalog(){
+  const chosen=Object.fromEntries(flowerFilters.value.map(group=>[group.key,group.values[selected[group.key]]]));
+  try {
+    flowerFilters.value=flowerFiltersFromResponse(await getFlowerFilterOptions());
+    flowerFilters.value.forEach(group=>{
+      const value=entryOptions?.[group.key] || chosen[group.key];
+      selected[group.key]=group.key==='budget' ? (entryOptions?.budget ? Math.min(4,Math.max(0,Number(entryOptions.budget)||0)) : selected.budget) : Math.max(0,group.values.indexOf(value));
+    });
+    entryOptions=null;
+  }catch(err){ /* Keep existing filters while the product request supplies the retry state. */ }
+  search();
 }
 onLoad(options=>{if(!props.categoryMode)init(options);});
-onMounted(()=>{if(props.categoryMode)init();});
-onShow(()=>{if(props.categoryMode)uni.showTabBar();});
+onMounted(()=>{if(props.categoryMode){init();refreshCatalog();}});
+onShow(()=>{if(props.categoryMode)uni.showTabBar();else refreshCatalog();});
 onReachBottom(()=>{if(!props.categoryMode)loadMore();});
 defineExpose({loadMore});
 </script>

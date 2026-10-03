@@ -1,5 +1,11 @@
 <template>
   <div class="divBox">
+    <el-tabs v-model="activeTab">
+      <el-tab-pane label="规格模板" name="templates" />
+      <el-tab-pane label="商品库存" name="stock" />
+    </el-tabs>
+    <FlowerStock v-if="activeTab === 'stock'" />
+    <template v-else>
     <el-card :bordered="false" shadow="never" class="ivu-mt" :body-style="{ padding: 0 }">
       <div class="padding-add">
         <el-form inline>
@@ -71,16 +77,19 @@
         />
       </div>
     </el-card>
+    </template>
   </div>
 </template>
 <script setup lang="jsx">
 import { reactive, ref, nextTick, onMounted, getCurrentInstance } from 'vue';
 import { ElMessage } from '@/utils/elementPlusFeedback';
 import { templateListApi, attrDeleteApi } from '@/api/store';
+import FlowerStock from './FlowerStock.vue';
 
 defineOptions({ name: 'StoreAttr' });
 
 const { proxy } = getCurrentInstance();
+const activeTab = ref('templates');
 
 const formDynamic = ref({
   ruleName: '',

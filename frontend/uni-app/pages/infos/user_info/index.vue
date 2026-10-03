@@ -24,7 +24,7 @@
 						<view>昵称</view>
 						<view class='input'>
 							<!-- #ifndef MP -->
-							<input type='text' name='nickname' :value='userInfo.nickname' maxlength="20"></input>
+							<input type='text' name='nickname' :value='nickname' maxlength="20"></input>
 							<!-- #endif -->
 							<!-- #ifdef MP -->
 							<input type="nickname" name='nickname' :value='nickname' class="weui-input"
@@ -87,7 +87,7 @@
 
 <script setup>
 	import { ref } from 'vue';
-	import { onLoad } from '@dcloudio/uni-app';
+	import { onLoad, onShow } from '@dcloudio/uni-app';
 	import { userEdit } from '@/api/user.js';
 	import {
 		toLogin
@@ -123,10 +123,10 @@ import { useColor } from '@/composables/useColor.js';
 
 	onLoad(() => {
 		if (!isLogin.value) {
-			toLogin();
+			return toLogin();
 		}
-		newAvatar.value = userInfo.value.avatar ? userInfo.value.avatar : `${Cache.get("imgHost")}/crmebimage/perset/staticImg/f.png`;
-		nickname.value = userInfo.value.nickname ? userInfo.value.nickname : '-';
+		newAvatar.value = userInfo.value?.avatar || `${Cache.get("imgHost")}/crmebimage/perset/staticImg/f.png`;
+		nickname.value = userInfo.value?.nickname || '';
 		// #ifdef H5
 		let ua = navigator.userAgent.toLowerCase();
 		if (ua.match(/MicroMessenger/i) == "micromessenger") {
@@ -152,6 +152,14 @@ import { useColor } from '@/composables/useColor.js';
 				editPng.value = `${Cache.get("imgHost")}/crmebimage/perset/staticImg/alert1.png`
 				break;
 		}
+	});
+
+	onShow(() => {
+		if (!isLogin.value) return;
+		appStore.USERINFO(true).then(info => {
+			newAvatar.value = info.avatar || '';
+			nickname.value = info.nickname || '';
+		}).catch(err => util.Tips({ title: err.msg || '个人资料暂时无法加载，请重试' }));
 	});
 
 	//to协议
@@ -212,11 +220,7 @@ import { useColor } from '@/composables/useColor.js';
 			title: '用户姓名不能为空'
 		});
 		value.avatar = newAvatar.value ? newAvatar.value : userInfo.value.avatar;
-		userEdit(value).then(res => {
-			appStore.changInfo({
-				amount1: 'avatar',
-				amount2: newAvatar.value
-			});
+		userEdit(value).then(() => appStore.USERINFO(true)).then(() => {
 			return util.Tips({
 				title: '保存成功',
 				icon: 'success'
@@ -225,12 +229,9 @@ import { useColor } from '@/composables/useColor.js';
 				url: 1
 			});
 
-		}).catch(msg => {
+		}).catch(err => {
 			return util.Tips({
-				title: msg || '保存失败，您并没有修改'
-			}, {
-				tab: 3,
-				url: 1
+				title: err.msg || '保存失败，请重试'
 			});
 		});
 	})

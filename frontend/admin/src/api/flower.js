@@ -11,6 +11,15 @@ export function saveFlowerProduct(productId, data) {
 export function getFlowerProductList(params) {
   return request({ url: '/admin/flower/product/list', method: 'get', params });
 }
+export function getFlowerFilterOptions() {
+  return request({ url: '/admin/flower/product/filters', method: 'get' });
+}
+export function getFlowerProductTabs(params) {
+  return request({ url: '/admin/flower/product/tabs', method: 'get', params });
+}
+export function exportFlowerProducts(params) {
+  return request({ url: '/admin/export/excel/flower/product', method: 'get', params });
+}
 
 export const getDeliveryZones = (params) => request({ url: '/admin/flower/delivery/zone/list', method: 'get', params });
 export const saveDeliveryZone = (data) => request({ url: '/admin/flower/delivery/zone', method: 'post', data });

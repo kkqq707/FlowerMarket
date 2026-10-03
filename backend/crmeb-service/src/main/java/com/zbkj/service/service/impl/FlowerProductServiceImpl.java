@@ -13,6 +13,8 @@ import com.zbkj.service.dao.FlowerProductExtDao;
 import com.zbkj.service.service.FlowerProductService;
 import com.zbkj.service.service.FlowerMaterialService;
 import com.zbkj.service.service.StoreProductService;
+import com.zbkj.service.service.SystemConfigService;
+import com.zbkj.common.response.StoreProductTabsHeader;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,10 @@ import org.springframework.util.StringUtils;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +38,9 @@ public class FlowerProductServiceImpl implements FlowerProductService {
 
     @Autowired(required = false)
     private FlowerMaterialService flowerMaterialService;
+
+    @Autowired(required = false)
+    private SystemConfigService systemConfigService;
 
     public FlowerProductServiceImpl(FlowerProductExtDao flowerProductExtDao,
                                     StoreProductService storeProductService) {
@@ -103,8 +112,49 @@ public class FlowerProductServiceImpl implements FlowerProductService {
     @Override
     public List<FlowerProductCardResponse> searchAdmin(FlowerProductSearchRequest request) {
         FlowerProductSearchRequest safeRequest = request == null ? new FlowerProductSearchRequest() : request;
+        int warningStock = warningStock();
         PageHelper.startPage(safeRequest.getPage(), safeRequest.getLimit());
-        return flowerProductExtDao.searchAdmin(safeRequest);
+        return flowerProductExtDao.searchAdmin(safeRequest, warningStock);
+    }
+
+    @Override
+    public List<StoreProductTabsHeader> adminTabs(FlowerProductSearchRequest request) {
+        FlowerProductSearchRequest criteria = new FlowerProductSearchRequest();
+        if (request != null) BeanUtils.copyProperties(request, criteria);
+        int warningStock = warningStock();
+        String[] labels = {"出售中商品", "仓库中商品", "已售罄商品", "警戒库存", "商品回收站"};
+        List<StoreProductTabsHeader> headers = new ArrayList<>();
+        for (int type = 1; type <= labels.length; type++) {
+            criteria.setType(type);
+            headers.add(new StoreProductTabsHeader(flowerProductExtDao.countAdmin(criteria, warningStock), labels[type - 1], type));
+        }
+        return headers;
+    }
+
+    private int warningStock() {
+        String value = systemConfigService == null ? null : systemConfigService.getValueByKey("store_stock");
+        try {
+            return value == null ? 0 : Math.max(0, Integer.parseInt(value.trim()));
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
+    }
+
+    @Override
+    public Map<String, List<String>> filterOptions(boolean onSale) {
+        List<FlowerProductCardResponse> products = flowerProductExtDao.filterSources(onSale);
+        Map<String, List<String>> options = new LinkedHashMap<>();
+        options.put("occasion", collectTags(products, FlowerProductCardResponse::getOccasion));
+        options.put("recipient", collectTags(products, FlowerProductCardResponse::getRecipient));
+        options.put("colorSeries", collectTags(products, FlowerProductCardResponse::getColorSeries));
+        return options;
+    }
+
+    private List<String> collectTags(List<FlowerProductCardResponse> products,
+                                    Function<FlowerProductCardResponse, String> field) {
+        return products.stream().map(field).filter(StringUtils::hasText)
+                .flatMap(value -> Arrays.stream(value.replace('，', ',').split(",")))
+                .map(String::trim).filter(StringUtils::hasText).distinct().collect(Collectors.toList());
     }
 
     @Override

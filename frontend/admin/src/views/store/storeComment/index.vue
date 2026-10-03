@@ -96,6 +96,9 @@
             <a @click="handleDelete(scope.row.id, scope.$index)" v-hasPermi="['admin:product:reply:delete']">删除</a>
           </template>
         </el-table-column>
+        <template #empty>
+          <el-empty description="暂无顾客评价。顾客完成订单并提交评价后，会显示在这里。" />
+        </template>
       </el-table>
       <div class="block">
         <el-pagination

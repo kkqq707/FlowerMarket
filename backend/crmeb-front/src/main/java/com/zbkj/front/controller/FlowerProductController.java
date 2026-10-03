@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/front/flower/product")
@@ -19,6 +21,12 @@ public class FlowerProductController {
 
     @Autowired
     private FlowerProductService flowerProductService;
+
+    @ApiOperation(value = "读取在售花礼实际使用的筛选标签")
+    @GetMapping("/filters")
+    public CommonResult<Map<String, List<String>>> filters() {
+        return CommonResult.success(flowerProductService.filterOptions(true));
+    }
 
     @ApiOperation(value = "鲜花商品列表与条件筛选")
     @GetMapping("/list")

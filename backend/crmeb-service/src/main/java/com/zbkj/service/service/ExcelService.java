@@ -4,6 +4,7 @@ import com.zbkj.common.request.StoreBargainSearchRequest;
 import com.zbkj.common.request.StoreCombinationSearchRequest;
 import com.zbkj.common.request.StoreOrderSearchRequest;
 import com.zbkj.common.request.StoreProductSearchRequest;
+import com.zbkj.common.request.flower.FlowerProductSearchRequest;
 
 /**
 * StoreProductService 接口
@@ -39,6 +40,7 @@ public interface ExcelService{
      * @return 导出地址
      */
     String exportProduct(StoreProductSearchRequest request);
+    String exportFlowerProduct(FlowerProductSearchRequest request);
 
     /**
      * 订单导出

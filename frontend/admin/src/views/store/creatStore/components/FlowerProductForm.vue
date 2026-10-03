@@ -17,13 +17,17 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import { getFlowerFilterOptions } from '@/api/flower';
 const props = defineProps({ modelValue: { type: Object, required: true }, disabled: Boolean, productId: Number });
 const emit = defineEmits(['update:modelValue']);
 const model = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) });
-const occasions = ['生日祝福', '浪漫告白', '纪念日', '探望慰问', '开业庆典', '日常惊喜'];
-const recipients = ['恋人', '朋友', '长辈', '家人', '同事', '自己'];
-const colors = ['粉色系', '红色系', '香槟色系', '白绿色系', '紫色系', '橙黄色系'];
+const options = ref({});
+const choices = field => computed(() => [...new Set([...(options.value[field] || []), ...(model.value[field] || '').split(',').filter(Boolean)])]);
+const occasions = choices('occasion');
+const recipients = choices('recipient');
+const colors = choices('colorSeries');
+onMounted(() => { getFlowerFilterOptions().then(data => { options.value = data; }).catch(() => {}); });
 function values(field) { return computed({ get: () => model.value[field] ? model.value[field].split(',').filter(Boolean) : [], set: value => { model.value[field] = value.join(','); } }); }
 const occasionValues = values('occasion');
 const recipientValues = values('recipient');

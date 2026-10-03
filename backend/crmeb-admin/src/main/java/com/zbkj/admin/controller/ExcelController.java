@@ -5,6 +5,7 @@ import com.zbkj.common.request.StoreBargainSearchRequest;
 import com.zbkj.common.request.StoreCombinationSearchRequest;
 import com.zbkj.common.request.StoreOrderSearchRequest;
 import com.zbkj.common.request.StoreProductSearchRequest;
+import com.zbkj.common.request.flower.FlowerProductSearchRequest;
 import com.zbkj.common.result.CommonResult;
 import com.zbkj.service.service.ExcelService;
 import io.swagger.annotations.Api;
@@ -40,6 +41,15 @@ public class ExcelController {
 
     @Autowired
     private ExcelService excelService;
+
+    @PreAuthorize("hasAuthority('admin:export:excel:product')")
+    @ApiOperation(value = "按鲜花商品列表筛选条件导出")
+    @RequestMapping(value = "/flower/product", method = RequestMethod.GET)
+    public CommonResult<HashMap<String, String>> exportFlower(@Validated FlowerProductSearchRequest request) {
+        HashMap<String, String> map = CollUtil.newHashMap();
+        map.put("fileName", excelService.exportFlowerProduct(request));
+        return CommonResult.success(map);
+    }
 
     /**
      * 商品导出

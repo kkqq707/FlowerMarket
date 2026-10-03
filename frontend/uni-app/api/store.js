@@ -19,6 +19,15 @@ export function getFlowerProducts(data = {}) {
 export function getFlowerDetail(id) {
 	return request.get('flower/product/' + id, {}, { noAuth: true });
 }
+export function getFlowerFilterOptions() {
+	return request.get('flower/product/filters', {}, { noAuth: true });
+}
+export function flowerFiltersFromResponse(response) {
+	const data = response?.data || {};
+	return flowerFilters.map(group => group.key === 'budget' ? group : {
+		...group, values: ['全部', ...new Set((Array.isArray(data[group.key]) ? data[group.key] : []).filter(Boolean))]
+	});
+}
 export function getFlowerStoreConfig() {
 	return request.get('flower/store/config', {}, { noAuth: true });
 }
@@ -52,8 +61,7 @@ export const flowerDemoProducts = [
 
 export function flowerCartRecommendationsFromResponse(response, limit = 6) {
 	const realFlowers = flowerProductsFromResponse(response);
-	const source = realFlowers.length ? realFlowers : flowerDemoProducts;
-	return source.slice(0, limit);
+	return realFlowers.slice(0, limit);
 }
 
 export const flowerFilters = [

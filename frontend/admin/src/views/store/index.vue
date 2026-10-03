@@ -203,23 +203,20 @@
 </template>
 
 <script setup lang="jsx">
-import { reactive, ref, onMounted, getCurrentInstance } from 'vue';
+import { reactive, ref, onMounted, onActivated, getCurrentInstance } from 'vue';
 import { ElMessage } from '@/utils/elementPlusFeedback';
 import {
   productDeleteApi,
   categoryApi,
   putOnShellApi,
   offShellApi,
-  productHeadersApi,
-  productExportApi,
   restoreApi,
-  productExcelApi,
 } from '@/api/store';
 import { getToken } from '@/utils/auth';
 import storeEdit from './components/storeEdit';
 import { checkPermi } from '@/utils/permission'; // 权限判断函数
 import { Debounce } from '@/utils/validate.js';
-import { getFlowerProductList } from '@/api/flower';
+import { getFlowerProductList, getFlowerFilterOptions, getFlowerProductTabs, exportFlowerProducts } from '@/api/flower';
 
 defineOptions({ name: 'ProductList' });
 
@@ -235,6 +232,9 @@ const props = {
 // roterPre: roterPre,
 const headeNum = ref([]);
 const listLoading = ref(true);
+let productRequestVersion = 0;
+let headerRequestVersion = 0;
+let hasActivated = false;
 const tableData = reactive({
   data: [],
   total: 0,
@@ -249,9 +249,16 @@ const tableFrom = reactive({
   colorSeries: '',
   type: '1',
 });
-const occasionOptions = ['生日祝福', '浪漫告白', '纪念日', '探望慰问', '开业庆典', '日常惊喜'];
-const recipientOptions = ['恋人', '朋友', '长辈', '家人', '同事', '自己'];
-const colorOptions = ['粉色系', '红色系', '香槟色系', '白绿色系', '紫色系', '橙黄色系'];
+const occasionOptions = ref([]);
+const recipientOptions = ref([]);
+const colorOptions = ref([]);
+function loadFilterOptions() {
+  getFlowerFilterOptions().then(options => {
+    occasionOptions.value = options.occasion || [];
+    recipientOptions.value = options.recipient || [];
+    colorOptions.value = options.colorSeries || [];
+  }).catch(() => {});
+}
 const categoryList = ref([]);
 const merCateList = ref([]);
 const objectUrl = process.env.VUE_APP_BASE_API;
@@ -280,6 +287,7 @@ function handleStock(row) {
 }
 //重置
 function handleReset() {
+  tableFrom.page = 1;
   tableFrom.cateId = '';
   tableFrom.keywords = '';
   tableFrom.occasion = '';
@@ -305,21 +313,21 @@ function seachList() {
 }
 // 导出
 function exports() {
-  productExcelApi({
-    cateId: tableFrom.cateId,
-    keywords: tableFrom.keywords,
-    type: tableFrom.type,
-  }).then((res) => {
+  exportFlowerProducts(productQuery()).then((res) => {
     window.location.href = res.fileName;
   });
 }
 // 获取商品表单头数量
 function goodHeade() {
-  productHeadersApi(tableFrom)
+  if (!checkPermi(['admin:product:tabs:headers'])) return;
+  const requestVersion = ++headerRequestVersion;
+  getFlowerProductTabs(productQuery())
     .then((res) => {
+      if (requestVersion !== headerRequestVersion) return;
       headeNum.value = res;
     })
     .catch((res) => {
+      if (requestVersion !== headerRequestVersion) return;
       ElMessage.error(res.message);
     });
 }
@@ -334,22 +342,33 @@ function getCategorySelect() {
     });
 }
 // 列表
-function getList() {
-  listLoading.value = true;
-  getFlowerProductList({
+function productQuery() {
+  return {
     page: tableFrom.page,
     limit: tableFrom.limit,
     keyword: tableFrom.keywords,
+    cid: tableFrom.cateId || undefined,
+    type: Number(tableFrom.type),
     occasion: tableFrom.occasion,
     recipient: tableFrom.recipient,
     colorSeries: tableFrom.colorSeries,
-  })
+  };
+}
+function getList() {
+  const requestVersion = ++productRequestVersion;
+  listLoading.value = true;
+  tableData.data = [];
+  tableData.total = 0;
+  loadFilterOptions();
+  getFlowerProductList(productQuery())
     .then((res) => {
+      if (requestVersion !== productRequestVersion) return;
       tableData.data = res.list;
       tableData.total = res.total;
       listLoading.value = false;
     })
     .catch((res) => {
+      if (requestVersion !== productRequestVersion) return;
       listLoading.value = false;
       ElMessage.error(res.message);
     });
@@ -413,6 +432,13 @@ function checkSave() {
   setTimeout(proxy.$modal.closeLoading(), 1000);
 }
 
+onActivated(() => {
+  if (hasActivated) {
+    getList();
+    goodHeade();
+  }
+  hasActivated = true;
+});
 onMounted(() => {
   goodHeade();
   getList();

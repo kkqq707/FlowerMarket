@@ -5,6 +5,8 @@ import com.zbkj.common.model.flower.FlowerProductExt;
 import com.zbkj.common.model.product.StoreProduct;
 import com.zbkj.common.request.flower.FlowerProductExtRequest;
 import com.zbkj.common.request.flower.FlowerProductSearchRequest;
+import com.zbkj.common.response.flower.FlowerProductCardResponse;
+import com.zbkj.common.response.StoreProductTabsHeader;
 import com.zbkj.service.dao.FlowerProductExtDao;
 import com.zbkj.service.service.StoreProductService;
 import org.junit.Assert;
@@ -15,11 +17,57 @@ import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.List;
 
 /**
  * 鲜花商品扩展服务测试。
  */
 public class FlowerProductServiceImplTest {
+
+    @Test
+    public void adminTabsPreserveFiltersWithoutChangingTheSelectedStatus() {
+        FlowerProductSearchRequest request = new FlowerProductSearchRequest();
+        request.setType(2);
+        request.setCid(9101);
+        request.setRecipient("爱人");
+        FlowerProductExtDao dao = proxy(FlowerProductExtDao.class, (instance, method, args) -> {
+            if ("countAdmin".equals(method.getName())) {
+                FlowerProductSearchRequest criteria = (FlowerProductSearchRequest) args[0];
+                Assert.assertEquals(Integer.valueOf(9101), criteria.getCid());
+                Assert.assertEquals("爱人", criteria.getRecipient());
+                return criteria.getType() * 10;
+            }
+            return defaultValue(method.getReturnType());
+        });
+        FlowerProductServiceImpl service = new FlowerProductServiceImpl(dao, proxyReturning(StoreProductService.class, null));
+        List<StoreProductTabsHeader> headers = service.adminTabs(request);
+        Assert.assertEquals(5, headers.size());
+        for (int index = 0; index < headers.size(); index++) {
+            Assert.assertEquals(Integer.valueOf(index + 1), headers.get(index).getType());
+            Assert.assertEquals(Integer.valueOf((index + 1) * 10), headers.get(index).getCount());
+        }
+        Assert.assertEquals(Integer.valueOf(2), request.getType());
+    }
+
+    @Test
+    public void filterOptionsUseActualStoredTagsAndKeepCustomValues() {
+        FlowerProductCardResponse first = new FlowerProductCardResponse();
+        first.setOccasion("日常,生日");
+        first.setRecipient("爱人, 朋友 ");
+        first.setColorSeries("白绿色，香槟色");
+        FlowerProductCardResponse second = new FlowerProductCardResponse();
+        second.setOccasion("生日");
+        second.setRecipient("朋友,客户");
+        second.setColorSeries("白绿色,自定义色");
+        FlowerProductExtDao dao = proxy(FlowerProductExtDao.class, (instance, method, args) ->
+                "filterSources".equals(method.getName()) ? Arrays.asList(first, second) : defaultValue(method.getReturnType()));
+        FlowerProductServiceImpl service = new FlowerProductServiceImpl(dao, proxyReturning(StoreProductService.class, null));
+        Map<String, List<String>> options = service.filterOptions(true);
+        Assert.assertEquals(Arrays.asList("日常", "生日"), options.get("occasion"));
+        Assert.assertEquals(Arrays.asList("爱人", "朋友", "客户"), options.get("recipient"));
+        Assert.assertEquals(Arrays.asList("白绿色", "香槟色", "自定义色"), options.get("colorSeries"));
+    }
 
     @Test(expected = CrmebException.class)
     public void saveOrUpdateRejectsMissingBaseProduct() {

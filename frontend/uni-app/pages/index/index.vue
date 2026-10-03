@@ -2,14 +2,17 @@
   <view class="flower-home">
     <hero :brand="brand" :image="heroImage" @browse="browse" />
     <view v-if="loading" class="data-note">正在整理今日花事…</view>
-    <view v-else-if="demo" class="data-note">演示内容 · 商品服务暂未连接，图片为花艺占位图 <button @click="loadHome">重新加载</button></view>
+    <view v-else-if="error" class="data-note">{{ error }} <button @click="loadHome">重新加载</button></view>
     <category-nav :items="categories" @select="openCategory" />
+    <template v-if="products.length">
     <weekly-new :products="products" @select="openProduct" @add-cart="chooseSku" />
     <budget-nav @select="openBudget" />
     <view class="recommend"><flower-section-title title="日常花礼推荐" align="left" /><view class="product-grid"><flower-product-card v-for="item in recommendedProducts" :key="item.id" :product="item" @product-click="openProduct" @add-cart="chooseSku" /></view></view>
     <editorial-feature title="人气精选" :image="products[0] && products[0].image" :caption="products[0] ? products[0].store_name : '留给重要的人'" note="用一束当季鲜花，记住相聚的时刻。" @select="openProduct(products[0])" />
     <editorial-feature title="专属定制花礼" :image="products[2] && products[2].image" caption="你的心意，自有模样" note="从喜欢的色彩与预算开始，寻找属于你的花礼。" action="挑选心意花礼" compact @select="browse" />
     <view class="care-feature" role="button" tabindex="0" @click="openCare" @keyup.enter="openCare"><view><text class="care-feature__title">一束花的日常照看</text><text class="care-feature__copy">从醒花到换水，把花期留得久一点。</text><text class="care-feature__link">阅读养花指南 ↗</text></view><image :src="products[0] && products[0].image" mode="aspectFill" alt="鲜花养护" /></view>
+    </template>
+    <view v-else-if="!loading && !error" class="data-note">暂无在售花礼，请稍后再来看看。</view>
     <brand-story :brand="brand" :story="story" />
     <service-promise />
     <view v-if="isPreview" class="preview"><text>主题预览</text><button @click="exitPreview">退出预览</button></view>
@@ -28,7 +31,7 @@ import EditorialFeature from '@/components/flower-home/editorial-feature.vue';
 import ServicePromise from '@/components/flower-home/service-promise.vue';
 import FlowerSectionTitle from '@/components/flower-section-title/index.vue';
 import FlowerProductCard from '@/components/flower-product-card/index.vue';
-import { getFlowerProducts, getCategoryList, getFlowerStoreConfig, flowerProductsFromResponse, flowerDemoProducts } from '@/api/store.js';
+import { getFlowerProducts, getCategoryList, getFlowerStoreConfig, flowerProductsFromResponse } from '@/api/store.js';
 import { getThemeInfo } from '@/api/api.js';
 import { getShare } from '@/api/public.js';
 import { getCartCounts } from '@/api/order.js';
@@ -38,7 +41,7 @@ import { FLOWER_BRAND } from '@/utils/flower-brand.js';
 
 const { proxy } = getCurrentInstance();
 const appStore = useAppStore();
-const brand = ref(FLOWER_BRAND.name), story = ref(''), heroImage = ref(''), products = ref([]), loading = ref(false), demo = ref(false);
+const brand = ref(FLOWER_BRAND.name), story = ref(''), heroImage = ref(''), products = ref([]), loading = ref(false), error = ref('');
 const isPreview = ref(false), themeId = ref(''), shareInfo = ref({});
 const defaultCategories = ['日常','生日','纪念日','祝贺'].map(name => ({ name, occasion: name }));
 const categories = ref(defaultCategories);
@@ -60,13 +63,13 @@ async function loadHome() {
   ]);
   const [goods, category, design, share, storeConfig] = results;
   const list = goods.status === 'fulfilled' ? flowerProductsFromResponse(goods.value) : [];
-  demo.value = !list.length;
-  products.value = list.length ? list : flowerDemoProducts;
-  // Only flower-related category labels are exposed in this dedicated storefront.
+  error.value = goods.status === 'rejected' ? (goods.reason?.msg || '花礼暂时无法加载，请重试。') : '';
+  products.value = list;
+  story.value = '';
+  heroImage.value = '';
   if (category.status === 'fulfilled') {
     const rows = Array.isArray(category.value.data) ? category.value.data : [];
-    const flowers = rows.filter(item => /花|生日|纪念|祝贺|探望/.test(item.name || item.cateName || item.cate_name || ''));
-    categories.value = flowers.length ? flowers.slice(0,4).map(item => ({ id:item.id, name:item.name || item.cateName || item.cate_name })) : defaultCategories;
+    categories.value = rows.slice(0,4).map(item => ({ id:item.id, name:item.name || item.cateName || item.cate_name }));
   }
   if (design.status === 'fulfilled' && design.value.data) {
     const config = design.value.data;
@@ -95,10 +98,11 @@ onLoad(options => {
   isPreview.value=!!themeId.value;
   if (themeId.value) uni.setStorageSync('previewThemeId',themeId.value);
   if (options.spid) getApp().globalData.spid=options.spid;
-  applyTheme(themeId.value).catch(()=>{}); loadHome();
+  applyTheme(themeId.value).catch(()=>{});
 });
 onShow(() => {
   showTabs();
+  loadHome();
   if (appStore.isLogin) getCartCounts(true,'total').then(res => {
     const count=Number(res.data.count)||0;
     if(count) uni.setTabBarBadge({index:2,text:count>99?'99+':String(count)});
