@@ -1,215 +1,130 @@
-<div align="center">
-    <img src="https://images.gitee.com/uploads/images/2021/1109/164354_0aafe3d2_892944.gif" />
-</div>
+# Huajianji · Flower Market
 
-<div align="center">
+[简体中文](README_ZH.md) | English
 
-CRMEB Open Source Mall System (Java Version)
+Huajianji (花间集, FlowerMarket) is a single-store flower shop application adapted from CRMEB Java. It includes a customer storefront, a shop management console, and backend APIs for flower purchases, scheduled delivery, and daily shop operations.
 
-</div>
+## Features
 
-<div align="center">
-    <a href="http://www.crmeb.com?from=giteejava">
-        <img src="https://img.shields.io/badge/License-apache2.0-green.svg?style=flat" />
-    </a>
-    <a href='https://gitee.com/ZhongBangKeJi/crmeb_java/members'>
-        <img src='https://gitee.com/ZhongBangKeJi/crmeb_java/badge/fork.svg?theme=dark' alt='fork'></img>
-    </a>
-    <a href='https://gitee.com/ZhongBangKeJi/crmeb_java/stargazers'>
-        <img src='https://gitee.com/ZhongBangKeJi/crmeb_java/badge/star.svg?theme=dark' alt='star'></img>
-    </a>
-</div>
+- Customer storefront: categories and search, product variants, cart, scheduled delivery, greeting card messages, order progress, and flower care articles.
+- Management console: products and categories, variant templates and SKU stock, order fulfillment, delivery zones and slots, dashboard, customers and staff permissions, storefront decoration, and shop settings.
+- Flower materials: material records, stock batches, freshness and low-stock alerts, product recipes, and order reservations and consumption. Material consumption requires a configured recipe and batch management enabled for the product.
+- Fulfillment: awaiting payment → awaiting acceptance → awaiting production → in production → awaiting delivery → delivering → completed.
 
-<div align="center" style="font-size: 15px;">
-  We are committed to open source, and your encouragement is also very important to us! Top right corner Star🌟, waiting for you to light it up
-</div>
+## Technology
 
-####
+| Module | Technology and environment |
+| --- | --- |
+| Backend | JDK 8, Spring Boot 2.2.6, Spring Security, MyBatis-Plus 3.3.1, Maven |
+| Database and cache | MySQL 8.0, Redis |
+| Management console | Vue 3, Element Plus, Pinia, Vite 5 |
+| Customer storefront | uni-app (Vue 3), Pinia; build scripts for H5, WeChat Mini Programs, and App |
+| Frontend tools | Node.js 18+, npm 8+; the console test command below requires Node.js 22+ |
 
-<div align="center">
+`frontend/pc` contains only a placeholder README. A standalone PC storefront is not implemented.
 
-[简体中文](./README_ZH.md)  |  English
+## Repository structure
 
-</div>
-
-####
-
-<div align="center">
-
-[Official Website](https://www.crmeb.com/?from=giteejava) |
-[Online Demo](https://admin.java.crmeb.net) |
-[Help Documentation](https://doc.crmeb.com/java/crmeb_java_30) |
-[Technical Forum](https://www.crmeb.com/ask/thread/list/152?from=giteejava) |
-[Plugin Marketplace](https://www.crmeb.com/market?from=giteephp) |
-[Theme Market](https://www.crmeb.com/theme) |
-
-
-</div>
-
----
-
-### 📖 Project Introduction
-
-CRMEB Open Source Mall System Java Version, a system based on Apache-An open source e-commerce solution released under the **Apache-2.0** license. The code is fully open source without encryption, can be used for free in commercial purposes, and is suitable for various enterprises and developers to quickly build a multi-terminal integrated shopping mall.
-
-#### Technical Architecture
-The system uses **Java + Vue + uni-App** technology stack is based on the SpringBoot framework, with a clear architecture design of separated front-end and back-end. Helped by uni-The app's cross-platform capabilities enable seamless realization of mini programs, official accounts, H5, APP, and PC end coverage, with unified data and synchronized business operations, greatly improving development and maintenance efficiency. At the same time, the system code is standardized and clear, with detailed comments, making secondary development very convenient.
-
-#### Core Function
-
-Management functions are comprehensive: Includes product management (supports SKU, attributes, categories, reviews), order management, user management, shopping cart, logistics management, financial statistics, multiple payment methods, etc.
-
-#### Marketing tools
-
-More than 10 marketing functions fully meet daily needs, including group buying, price cutting, flash sales, coupons, check-in, points, membership levels, balance recharge, distribution and viral marketing, event borders, atmosphere images, etc., with flexible activity rule settings.
-
-
-
----
-
-### 📝 **Theme Market**
-
-**Free Download**
-
-Come to the CRMEB Theme Plaza to enjoy a vast selection of premium templates and create a personalized mall with zero cost. No professional design skills are required. A vast number of free templates are available for direct download and use. A variety of theme styles can accurately match the needs of different industries, quickly enhancing the store's image and user experience, allowing your mall to start strong visually from the beginning.
-
-**One-click import**
-
-Simplify the complex, quickly refresh the mall interface. Say goodbye to the cumbersome manual DIY configuration process of the past. With just one click to import a theme package, you can seamlessly integrate the entire theme (including page layout and global color scheme) into your system. The system automatically completes component matching and data mounting, no code needs to be written, and the preview takes effect immediately. Making the mall's renovation and upgrade as easy as changing a mobile phone wallpaper, greatly saving the time and cost of operations and development.
-
-**Theme Square Listing**
-
-Not only use it freely, but also earn money easily. You can leverage the system's powerful DIY capabilities to freely combine color schemes, layouts, and components based on existing modules, creating a unique custom theme and directly publishing it to the Theme Plaza. You will receive the corresponding revenue share when other users pay to download your work. This not only provides a direct way to monetize your design capabilities and technical expertise, but also helps build a thriving open-source marketplace ecosystem, achieving a win-win situation for creativity and value.
-
-Theme Market：<a href="https://www.crmeb.com/theme" target="_blank">Theme Market</a>
-
-
-![Theme Market](backend/crmebimage/theme-cate/主题广场.png)
-
-#### Community Co-construction Plan
-
-We are committed to building a developer-friendly ecosystem, open-sourcing our code, continuously updating functional modules, and welcoming developers to submit optimization suggestions or contribute code. By sharing technological achievements, reducing the cost of redundant development in the industry, and promoting the sustainable development of open-source e-commerce systems.
-
----
-
-### ✨ System Advantages
-
-- **Mature and stable architecture**：Backend SpringBoot + SpringSecurity, frontend Vue + ElementUI (PC management end) and uni-app (mobile terminal), multi-terminal parallel development, clear structure.
-- **Standard interface design**：Provide standardized RESTful APIs and data structures, with high interface reuse rate, clear logical hierarchy, and convenient for secondary development and system integration.
-- **Data and Statistics**：Integrate ECharts to implement a multidimensional data dashboard, supporting multidimensional statistical analysis such as orders, users, and funds. Data can be exported to assist in operational decision-making.
-- **Efficient development support**：Supports Vue form drag-and-drop generation, greatly reducing repetitive front-end work and improving development efficiency.
-- **Fine-grained permission control**：Implementing role-based access control with Spring Security, which can be precise to the button level, ensuring system security.
-- **High availability design**：Built-in Redis queue, effectively peak shaving and decoupling, enhancing system concurrency capability and stability.
-
----
-
-![输入图片说明](backend/crmebimage/theme-cate/开源banner-Java.jpg)
-
-### 🛠️ Technology Stack and Runtime Environment
-
-| Category | Technology |
-|------|------|
-| backend framework | SpringBoot 2.2.6.RELEASE |
-| ORM | Mybatis Plus 3.3.1 |
-| MySQL | MySQL 8.0 |
-| Cache | Redis |
-| Build tool | Maven 3.6.1 |
-| API Documentation | swagger-bootstrap-ui 1.0 |
-| PC Management Terminal | Vue 2.x + Element UI 2.13 |
-| Mobile end | uni-app（H5 + official account + WeChat Mini Program） |
-| Development Tools | HbuilderX（Mobile End） |
-| Operating environment | Java 1.8、Node 14、npm 6 |
-| Compatibility | Mainstream browsers、Linux / Windows |
-
----
-
-### 📦 Project Structure
-
-```
-crmeb_java
-├── .crmeb/             Collaboration docs, same level as backend
-│   ├── agents/
-│   ├── documents/      Documents (API docs, installation guide)
-│   ├── rules/          Project conventions
-│   ├── skills/         Skills
-│   └── AGENTS.md
-├── backend/            API service (Java SpringBoot + MybatisPlus)
-└── frontend/           Frontend
-    ├── admin/          Management console (Vue3 + Element Plus)
-    ├── pc/             PC end
-    └── uni-app/        H5 / App / Mini Program (uni-app)
+```text
+FlowerMarket/
+├── backend/
+│   ├── crmeb-admin/     Management API; base example port 8080
+│   ├── crmeb-front/     Customer API; base example port 8081
+│   ├── crmeb-service/   Business services and data access
+│   ├── crmeb-common/    Models, requests, responses, and utilities
+│   ├── crmebimage/      Image assets
+│   └── sql/             Database initialization and upgrades
+├── frontend/
+│   ├── admin/           Shop management console
+│   ├── uni-app/         Customer storefront
+│   └── pc/              Placeholder for a standalone PC storefront
+├── docs/                Designs, implementation records, and asset notes
+├── deliverables/        Delivery notes and local verification records
+├── DESIGN.md            Management console design guidelines
+└── LICENSE              Apache-2.0 license
 ```
 
----
+## Local setup
 
-### 📖 System Features
+### 1. Initialize the database
 
-![System Features](backend/crmebimage/theme-cate/251201002.jpg)
+For a new database, import `backend/sql/Crmeb_v3.1.sql`, then run `v3.1-to-flower-mall-upgrade.sql`. For an existing v3.0 database, apply `v3.0-to-v3.1-upgrade.sql` first instead of importing the full database.
 
----
+After the base flower upgrade, a local demo can apply demo data, branding (optional), and thesis alignment in table order, followed by the material and care upgrades. Demo products use categories created by thesis alignment, so use those two scripts together. A business database can skip demo data and thesis alignment and maintain its own products, categories, and shop configuration.
 
-### 📖 UI Interface Display
+| Script (in `backend/sql/`) | Purpose |
+| --- | --- |
+| `flower-demo-data.sql` | Optional: local demo products, delivery, and shop configuration; enables mock payment |
+| `flower-brand-polish.sql` | Optional: Huajianji branding and menu order |
+| `flower-thesis-alignment.sql` | Companion to demo data: aligns menus, rebuilds product categories and the asset library, and cleans up some non-flower products |
+| `flower-material-inventory-upgrade.sql` | Materials, stock batches, recipes, and console menus |
+| `flower-care-knowledge-upgrade.sql` | Flower care categories, articles, and console menus |
 
-![UI Interface Display](backend/crmebimage/theme-cate/251201005.jpg)
+Back up the database before applying upgrades or demo scripts. Thesis alignment clears and rebuilds asset records and asset categories; use it only on a resettable demo database. Apply it before the material and care upgrades to avoid hiding their new menus. For catalog expansion scripts and the import tool, see the [product and inventory notes](deliverables/花卉商品与库存补充说明.md) (Chinese).
 
+### 2. Configure and start the backend
 
+Both `crmeb-admin` and `crmeb-front` provide `application*.example.yml` in `src/main/resources/`. On first setup, copy each module's `application.example.yml` to `application.yml`. Keep existing local configuration files if already configured.
 
----
+Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, and `SWAGGER_PASSWORD` in the terminals that launch the services. Set `REDIS_PASSWORD` if required. Use a JDBC URL pointing to the initialized database, with UTF-8 encoding and timezone settings.
 
-### 📖 Backend Interface Display
+Check the Redis address, service ports, and `crmeb.imagePath` (the backend directory containing `crmebimage`, ending in `/`). For another environment, copy its `application-<environment>.example.yml` and explicitly activate that profile. Profile files may override base ports; update frontend API addresses accordingly.
 
-![Backend Interface Display](backend/crmebimage/theme-cate/251201004.jpg)
+```sh
+cd backend
+mvn clean package -DskipTests
+```
 
+After building, start the services in separate terminals:
 
----
+```sh
+java -jar crmeb-admin/target/Crmeb-admin.jar
+```
 
+```sh
+java -jar crmeb-front/target/Crmeb-front.jar
+```
 
-### 🚀 System Demonstration
+Local configuration files and database backups are ignored by Git. Do not commit real credentials.
 
-![System Demonstration](backend/crmebimage/theme-cate/c2.jpg)
+### 3. Start the management console
 
-**Admin Panel**：https://admin.java.crmeb.net  
-Account：`demo` / Password:`crmeb.com`
+```sh
+cd frontend/admin
+npm install
+npm run dev
+```
 
-**H5**：https://java.crmeb.net
+The default development address is `http://localhost:9527`. Configure `VITE_APP_BASE_API` in `.env.development`; its default is `http://localhost:8080`. Use `npm run build` for a production build.
 
----
+### 4. Start the customer storefront
 
-### 📚 Project Materials
+```sh
+cd frontend/uni-app
+npm ci
+npm run dev:h5
+```
 
-**Document Resources**
+Configure `HTTP_REQUEST_URL` in `config/app.js`; its default is `http://127.0.0.1:8081`. Use a backend address accessible from the device when testing on a phone.
 
-| Document | Link |
-|------|------|
-| Use Document | https://doc.crmeb.com/java/crmeb_java_30/41958 |
-| API Documentation | https://s.apifox.cn/f6079100-abee-40fe-959d-846e44f1a048 |
-| Data Dictionary | https://doc.crmeb.com/java/crmeb_java_30/41957 |
-| Development document | https://doc.crmeb.com/java/crmeb_java_30/41829 |
-| Technical Community | https://www.crmeb.com/ask/thread/list/152 |
+For WeChat, run `npm run dev:mp-weixin`, set your AppID in `manifest.json`, and import `dist/dev/mp-weixin` into WeChat Developer Tools. Use `npm run build:mp-weixin` for a release build or `npm run build:h5` for H5.
 
-**Installation Tutorial**
+## Development checks
 
-- Video tutorial:[Click to view](https://www.bilibili.com/video/BV1MAiiY5EtP/?spm_id_from=333.1387.search.video.card.click&vd_source=9cea4dcdafd21c93762100c496e0f2a3)
-- Installation steps detailed：https://doc.crmeb.com/java/crmeb_java_30/41909
+Run each command from its respective directory:
 
----
+| Directory | Command |
+| --- | --- |
+| `backend/` | `mvn test` |
+| `frontend/admin/` | `npm run test:flower` |
+| `frontend/uni-app/` | `node --test tests/*.test.mjs` |
 
-### 💬 Technical Exchange
+Mock payment is for local demonstrations and requires `flower_mock_pay_enabled` to be explicitly enabled. It is disabled in the `prod` and `production` profiles. Real payment, SMS, and WeChat services require their own configuration.
 
-Welcome to join the CRMEB open source technology exchange group, scan the code to join the group and get free access to interface documents, function lists, mind maps and other resources!
+## Related documents
 
-![](backend/crmebimage/theme-cate/开源Java.jpg)
+- [Management console design guidelines](DESIGN.md) (Chinese)
+- [Frontend and backend data synchronization notes](deliverables/前后端数据同步修复说明.md) (Chinese)
+- [Flower image sources](docs/assets/huajianji-image-sources.md) (Chinese)
 
-You can also in [CRMEB Technology Community ](https://www.crmeb.com/ask/thread/list/152) Submit bugs, exchange solutions, and get official updates.
-
-
-[![输入图片说明](backend/crmebimage/theme-cate/java-saas.jpg)](https://shop.crmeb.com)
-
-
----
-
-❤️ In the name of business, safeguard the open source heart
-
-### 📕 Go online in 2 hours in your WeChat mall
-
-[![CRMEB saas](help/resource/pic/java-saas.jpg)](https://shop.crmeb.com)
+This project retains attribution to CRMEB. See [LICENSE](LICENSE) for the license terms.

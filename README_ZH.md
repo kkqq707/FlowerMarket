@@ -1,209 +1,130 @@
-<div align="center">
-    <img src="https://images.gitee.com/uploads/images/2021/1109/164354_0aafe3d2_892944.gif" />
-</div>
+# 花间集 · 花卉商城
 
-<div align="center">
+简体中文 | [English](README.md)
 
-CRMEB开源商城系统(Java版)
+花间集（FlowerMarket）是基于 CRMEB Java 二次开发的单商户花卉商城，包含顾客端、花店管理后台和后端 API，面向鲜花选购、预约配送与花店日常经营。
 
-</div>
+## 主要功能
 
-<div align="center">
-    <a href="http://www.crmeb.com?from=giteejava">
-        <img src="https://img.shields.io/badge/License-apache2.0-green.svg?style=flat" />
-    </a>
-    <a href='https://gitee.com/ZhongBangKeJi/crmeb_java/members'>
-        <img src='https://gitee.com/ZhongBangKeJi/crmeb_java/badge/fork.svg?theme=dark' alt='fork'></img>
-    </a>
-    <a href='https://gitee.com/ZhongBangKeJi/crmeb_java/stargazers'>
-        <img src='https://gitee.com/ZhongBangKeJi/crmeb_java/badge/star.svg?theme=dark' alt='star'></img>
-    </a>
-</div>
+- 顾客端：花卉分类与搜索、商品规格选择、购物车、预约配送、贺卡留言、订单进度和养花指南。
+- 管理后台：花卉商品与分类、规格模板与 SKU 库存、订单履约、配送区域与时段、经营看板、顾客与员工权限、商城装修及门店设置。
+- 花材管理：花材档案、批次入库、鲜度与低库存提醒、商品配方，以及订单花材预占和扣减。商品需配置配方并启用批次管理后才参与花材扣减。
+- 订单履约：待支付 → 待接单 → 待制作 → 制作中 → 待配送 → 配送中 → 已完成。
 
-<div align="center" style="font-size: 15px;">
-  用心做开源，我们也很需要你的鼓励！右上角Star🌟，等你点亮
-</div>
+## 技术栈
 
-####
+| 模块 | 技术与环境 |
+| --- | --- |
+| 后端 | JDK 8、Spring Boot 2.2.6、Spring Security、MyBatis-Plus 3.3.1、Maven |
+| 数据库与缓存 | MySQL 8.0、Redis |
+| 管理后台 | Vue 3、Element Plus、Pinia、Vite 5 |
+| 顾客端 | uni-app（Vue 3）、Pinia，提供 H5 / 微信小程序 / App 构建脚本 |
+| 前端工具 | Node.js 18+、npm 8+；运行下方后台测试命令需要 Node.js 22+ |
 
-<div align="center">
+`frontend/pc` 目前仅有说明文件，尚未提供独立 PC 商城。
 
-简体中文 | [English](./README.md) 
+## 项目结构
 
-</div>
-
-<div align="center">
-
-[官网](https://www.crmeb.com/?from=giteejava) |
-[在线体验](https://admin.java.crmeb.net) |
-[帮助文档](https://doc.crmeb.com/java/crmeb_java_30) |
-[应用市场](https://www.crmeb.com/market?from=giteephp) |
-[技术社区](https://www.crmeb.com/ask/thread/list/152?from=giteejava) |
-[主题广场](https://www.crmeb.com/theme) |
-[宽屏预览](https://gitee.com/ZhongBangKeJi/crmeb_java/blob/master/README.md)
-
-</div>
-
----
-
-### 📖 项目介绍
-
-CRMEB开源商城系统Java版，是一款基于**Apache-2.0**协议发布的开源电商解决方案。代码全开源无加密，可免费商用，适合各类企业及开发者快速构建多端一体化商城。
-
-#### 技术架构
-系统采用Java + Vue + uni-app技术栈，基于SpringBoot框架构建，前后端分离架构设计清晰。借助uni-app的跨端能力，轻松实现小程序、公众号、H5、APP、PC端全覆盖，数据统一、业务同步，极大提升开发与维护效率。同时，系统代码规范清晰，注释详尽，二次开发十分方便。
-
-#### 核心功能
-管理功能全面：包含商品管理（支持SKU、属性、分类、评价）、订单管理、用户管理、购物车、物流管理、财务统计、多种支付方式等。
-
-#### 丰富的营销工具
-10余种营销功能充分满足日常需求，包括拼团、砍价、秒杀、优惠券、签到、积分、等级会员、余额充值、分销裂变、活动边框、氛围图等，可灵活设置活动规则。
-
-
-
----
-
-### 📝 **主题广场**
-
-**免费下载**
-
-来CRMEB主题广场畅享海量精选模板，零成本打造个性化商城。无需具备专业设计能力，海量免费模版直接下载使用，多样化主题风格可精准匹配不同行业需求，快速提升店铺形象与用户体验，让您的商城在起步阶段就赢在视觉起跑线上。
-
-**一键导入**
-
-化繁为简，极速焕新商城界面。彻底告别过去繁琐的手动DIY配置流程，一键导入主题包，即可将整套主题（包含页面布局与全局配色）无缝融合至您的系统中。系统自动完成组件匹配与数据挂载，无需编写任何代码，即时预览生效。让商城改版升级像换手机壁纸一样轻松，极大节省了运营与开发的时间成本。
-
-**上架主题广场**
-
-不仅随心用，更能轻松赚。您可以利用系统强大的DIY功能，基于原有模块自由组合配色、布局与组件，打造出独具特色的专属主题，并直接上架至主题广场。当其他用户付费下载您的作品时，您将获得相应的收益分成。这不仅为您的设计能力与技术沉淀提供了直接的变现渠道，更助力共建繁荣的开源商城生态，实现创意与价值的双赢。
-
-主题广场：<a href="https://www.crmeb.com/theme" target="_blank">主题广场</a>
-
-![输入图片说明](backend/crmebimage/theme-cate/主题广场.png)
-
-#### 社区共建计划
-我们致力于打造开发者友好生态，开放源码、持续更新功能模块，并欢迎开发者提交优化建议或贡献代码。通过共享技术成果，降低行业重复造轮子成本，推动开源电商系统的可持续发展。
-
----
-
-### ✨ 系统优势
-
-- **成熟稳定的架构**：后端 SpringBoot + SpringSecurity，前端 Vue + ElementUI（PC管理端）与 uni-app（移动端），多端并行开发，结构清晰。
-- **规范的接口设计**：提供规范的RESTful API与数据结构，接口复用率高，逻辑层次清晰，便于二次开发与系统集成。
-- **数据与统计**：集成ECharts实现多维数据看板，支持订单、用户、资金等多维度统计分析，数据可导出，助力运营决策。
-- **高效开发支持**：支持Vue表单拖拽生成，大幅减少前端重复工作，提升开发效率。
-- **精细权限控制**：基于Spring Security实现角色权限控制，可精确到按钮级别，保障系统安全。
-- **高可用设计**：内置Redis队列，有效削峰解耦，提升系统并发能力与稳定性。
-
----
-
-![输入图片说明](backend/crmebimage/theme-cate/开源banner-Java.jpg)
-
-### 🛠️ 技术栈与运行环境
-
-| 类别 | 技术 |
-|------|------|
-| 后端框架 | SpringBoot 2.2.6.RELEASE |
-| ORM | Mybatis Plus 3.3.1 |
-| 数据库 | MySQL 8.0 |
-| 缓存 | Redis |
-| 构建工具 | Maven 3.6.1 |
-| API文档 | swagger-bootstrap-ui 1.0 |
-| PC管理端 | Vue 2.x + Element UI 2.13 |
-| 移动端 | uni-app（H5 + 公众号 + 微信小程序） |
-| 开发工具 | HbuilderX（移动端） |
-| 运行环境 | Java 1.8、Node 14、npm 6 |
-| 兼容性 | 主流浏览器（含 IE11+）、Linux / Windows |
-
----
-
-### 📦 项目结构
-
-```
-crmeb_java
-├── .crmeb/             协作文档目录，与 backend 同级
-│   ├── agents/
-│   ├── documents/      文档（接口文档、安装必读）
-│   ├── rules/          项目规范
-│   ├── skills/         技能
-│   └── AGENTS.md
-├── backend/            后端API服务（Java SpringBoot + MybatisPlus）
-└── frontend/           前端
-    ├── admin/          管理后台（Vue3 + Element Plus）
-    ├── pc/             PC 端
-    └── uni-app/        H5 / App / 小程序端（uni-app）
+```text
+FlowerMarket/
+├── backend/
+│   ├── crmeb-admin/     管理端 API，基础示例端口 8080
+│   ├── crmeb-front/     顾客端 API，基础示例端口 8081
+│   ├── crmeb-service/   业务服务与数据访问
+│   ├── crmeb-common/    实体、请求响应与公共工具
+│   ├── crmebimage/      图片素材
+│   └── sql/             数据库初始化与升级脚本
+├── frontend/
+│   ├── admin/           花店管理后台
+│   ├── uni-app/         顾客端
+│   └── pc/              独立 PC 商城占位目录
+├── docs/                设计方案、实施记录与素材说明
+├── deliverables/        交付说明与本地验证资料
+├── DESIGN.md            管理后台设计规范
+└── LICENSE              Apache-2.0 许可证
 ```
 
----
+## 本地运行
 
-### 📖 系统功能
+### 1. 初始化数据库
 
-![输入图片说明](backend/crmebimage/theme-cate/251201002.jpg)
+新数据库先导入 `backend/sql/Crmeb_v3.1.sql`，再执行 `v3.1-to-flower-mall-upgrade.sql`。已有 v3.0 数据库先执行 `v3.0-to-v3.1-upgrade.sql`，无需重新导入完整库。
 
----
+花卉基础升级后，本地演示可按表中顺序执行演示数据、品牌调整（可选）、论文整理，再执行花材库存和养花指南升级。演示商品使用的分类由论文整理脚本创建，两者应配套使用；业务数据库可跳过演示与论文整理，自行维护商品、分类和门店配置。
 
-### 📖 UI界面展示
+| 脚本（位于 `backend/sql/`） | 用途 |
+| --- | --- |
+| `flower-demo-data.sql` | 可选：本地演示商品、配送与门店配置，会开启模拟支付 |
+| `flower-brand-polish.sql` | 可选：花间集品牌标识与菜单排序 |
+| `flower-thesis-alignment.sql` | 演示配套：整理菜单、重建商品分类和素材库，并清理部分非花卉商品 |
+| `flower-material-inventory-upgrade.sql` | 花材、批次库存、配方与后台菜单 |
+| `flower-care-knowledge-upgrade.sql` | 养花指南分类、文章与后台菜单 |
 
-![输入图片说明](backend/crmebimage/theme-cate/251201005.jpg)
+执行升级或演示脚本前备份数据库。论文整理会清空并重建素材记录及素材分类，应仅用于可重置的演示库，并在花材库存、养花指南升级之前执行，以免隐藏这些新增菜单。商品扩充脚本及导入工具见[花卉商品与库存补充说明](deliverables/花卉商品与库存补充说明.md)。
 
+### 2. 配置并启动后端
 
+`crmeb-admin` 和 `crmeb-front` 的 `src/main/resources/` 均提供 `application*.example.yml`。首次运行将各自的 `application.example.yml` 复制为 `application.yml`，已有本地配置时保留原文件。
 
----
+在启动两个服务的终端中设置 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、`JWT_SECRET` 和 `SWAGGER_PASSWORD`；Redis 有密码时设置 `REDIS_PASSWORD`。`DB_URL` 使用指向已初始化数据库的 JDBC URL，并配置 UTF-8 编码与时区。
 
-### 📖 后台界面展示
+核对 Redis 地址、`crmeb.imagePath`（指向包含 `crmebimage` 的后端目录，以 `/` 结尾）及服务端口。使用其他环境时，复制对应的 `application-<环境>.example.yml` 并显式启用该 profile；环境文件可能覆盖基础端口，前端接口地址需同步调整。
 
-![输入图片说明](backend/crmebimage/theme-cate/251201004.jpg)
+```sh
+cd backend
+mvn clean package -DskipTests
+```
 
+构建后分别在两个终端启动：
 
----
+```sh
+java -jar crmeb-admin/target/Crmeb-admin.jar
+```
 
+```sh
+java -jar crmeb-front/target/Crmeb-front.jar
+```
 
-### 🚀 系统演示
+实际配置文件和数据库备份已被 Git 忽略，不提交真实凭据。
 
-![](backend/crmebimage/theme-cate/c2.jpg)
+### 3. 启动管理后台
 
-**管理后台**：https://admin.java.crmeb.net  
-账号：`demo` / 密码：`crmeb.com`
+```sh
+cd frontend/admin
+npm install
+npm run dev
+```
 
-**H5 端**：https://java.crmeb.net
+默认开发地址为 `http://localhost:9527`。接口地址由 `.env.development` 中的 `VITE_APP_BASE_API` 配置，默认指向 `http://localhost:8080`。生产构建使用 `npm run build`。
 
----
+### 4. 启动顾客端
 
-### 📚 项目资料
+```sh
+cd frontend/uni-app
+npm ci
+npm run dev:h5
+```
 
-**文档资源**
+接口地址位于 `config/app.js` 的 `HTTP_REQUEST_URL`，默认指向 `http://127.0.0.1:8081`。真机调试需改为设备可访问的后端地址。
 
-| 文档 | 链接 |
-|------|------|
-| 使用文档 | https://doc.crmeb.com/java/crmeb_java_30/41958 |
-| 接口文档 | https://s.apifox.cn/f6079100-abee-40fe-959d-846e44f1a048 |
-| 数据字典 | https://doc.crmeb.com/java/crmeb_java_30/41957 |
-| 二开文档 | https://doc.crmeb.com/java/crmeb_java_30/41829 |
-| 技术社区 | https://www.crmeb.com/ask/thread/list/152 |
+微信小程序使用 `npm run dev:mp-weixin`，并在 `manifest.json` 配置自己的 AppID。将 `dist/dev/mp-weixin` 导入微信开发者工具；发布构建使用 `npm run build:mp-weixin`。H5 发布构建使用 `npm run build:h5`。
 
-**安装教程**
+## 开发验证
 
-- 视频教程：[点击查看](https://www.bilibili.com/video/BV1MAiiY5EtP/?spm_id_from=333.1387.search.video.card.click&vd_source=9cea4dcdafd21c93762100c496e0f2a3)
-- 安装步骤详解：https://doc.crmeb.com/java/crmeb_java_30/41909
+分别在对应目录执行：
 
----
+| 目录 | 命令 |
+| --- | --- |
+| `backend/` | `mvn test` |
+| `frontend/admin/` | `npm run test:flower` |
+| `frontend/uni-app/` | `node --test tests/*.test.mjs` |
 
-### 💬 技术交流
+模拟支付仅用于本地演示，需显式开启 `flower_mock_pay_enabled`；`prod` / `production` 环境禁用。真实支付、短信和微信能力需另外配置对应服务。
 
-欢迎加入CRMEB开源技术交流群，扫码进群免费领取接口文档、功能清单、思维导图等资源！
+## 相关资料
 
-![](backend/crmebimage/theme-cate/开源Java.jpg)
+- [管理后台设计规范](DESIGN.md)
+- [前后端数据同步修复说明](deliverables/前后端数据同步修复说明.md)
+- [花卉图片来源说明](docs/assets/huajianji-image-sources.md)
 
-您还可以在 [CRMEB技术社区](https://www.crmeb.com/ask/thread/list/152) 中提交Bug、交流解决方案、获取官方更新动态。
-
----
-
-❤️ 以商业之名，护航开源之心
-
-### 本地后端配置
-
-后端 `crmeb-admin` 和 `crmeb-front` 的 `src/main/resources` 目录提供了 `application*.example.yml` 示例文件。首次运行时，将所需环境的示例文件复制为同名的 `application*.yml`（去掉 `.example`），并通过环境变量设置 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、`REDIS_PASSWORD`、`JWT_SECRET` 和 `SWAGGER_PASSWORD`。实际配置文件及数据库备份已被 Git 忽略，请不要提交真实凭据。
-
-### 📕 2小时快速搭建你的小程序商城
-
-[![输入图片说明](backend/crmebimage/theme-cate/java-saas.jpg)](https://shop.crmeb.com)
+本项目保留 CRMEB 来源说明，许可证见 [LICENSE](LICENSE)。

@@ -1,0 +1,58 @@
+{
+  "checkedAt": "2026-10-03T04:36:35.837Z",
+  "result": "passed",
+  "accounts": [
+    {
+      "account": "flower_manager",
+      "login": "passed",
+      "allowedPaths": [
+        "flower/dashboard",
+        "flower/order/list",
+        "flower/material/list",
+        "flower/product/list"
+      ],
+      "permissionChecks": "passed",
+      "privilegedAccess": "blocked"
+    },
+    {
+      "account": "flower_goods",
+      "login": "passed",
+      "allowedPaths": [
+        "flower/product/list",
+        "flower/material/list"
+      ],
+      "permissionChecks": "passed",
+      "privilegedAccess": "blocked"
+    },
+    {
+      "account": "flower_florist",
+      "login": "passed",
+      "allowedPaths": [
+        "flower/order/list",
+        "flower/material/list"
+      ],
+      "permissionChecks": "passed",
+      "privilegedAccess": "blocked"
+    },
+    {
+      "account": "flower_delivery",
+      "login": "passed",
+      "allowedPaths": [
+        "flower/order/list",
+        "flower/delivery/zone/list"
+      ],
+      "permissionChecks": "passed",
+      "privilegedAccess": "blocked"
+    },
+    {
+      "account": "flower_service",
+      "login": "passed",
+      "allowedPaths": [
+        "flower/order/list",
+        "user/list"
+      ],
+      "permissionChecks": "passed",
+      "privilegedAccess": "blocked"
+    }
+  ]
+}

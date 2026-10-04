@@ -176,7 +176,7 @@
     },
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "touristappid",
+        "appid" : "wx845c61af86051635",
         "setting" : {
             "urlCheck" : false,
             "minified" : true,

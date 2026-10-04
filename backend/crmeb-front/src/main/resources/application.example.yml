@@ -1,7 +1,7 @@
 # CRMEB 相关配置
 crmeb:
   version: CRMEB-JAVA-KY-v3.1 # 当前代码版本
-  imagePath: D:/projects/crmeb_java-3.1/crmeb_java-3.1/backend/ # 本地图片根目录，该目录下包含 crmebimage
+  imagePath: D:/projects/FlowerMarket/backend/ # 本地图片根目录，该目录下包含 crmebimage
   asyncConfig: false #是否同步config表数据到redis
   jwt-secret: ${JWT_SECRET}
   activityStyleCachedTime: 10 #活动边框缓存周期 秒为单位，生产环境适当5-10分钟即可
