@@ -40,7 +40,6 @@ FlowerMarket/
 │   └── pc/              Placeholder for a standalone PC storefront
 ├── docs/                Designs, implementation records, and asset notes
 ├── deliverables/        Delivery notes and local verification records
-├── DESIGN.md            Management console design guidelines
 └── LICENSE              Apache-2.0 license
 ```
 
@@ -123,7 +122,6 @@ Mock payment is for local demonstrations and requires `flower_mock_pay_enabled` 
 
 ## Related documents
 
-- [Management console design guidelines](DESIGN.md) (Chinese)
 - [Frontend and backend data synchronization notes](deliverables/前后端数据同步修复说明.md) (Chinese)
 - [Flower image sources](docs/assets/huajianji-image-sources.md) (Chinese)
 

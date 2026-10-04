@@ -40,7 +40,6 @@ FlowerMarket/
 │   └── pc/              独立 PC 商城占位目录
 ├── docs/                设计方案、实施记录与素材说明
 ├── deliverables/        交付说明与本地验证资料
-├── DESIGN.md            管理后台设计规范
 └── LICENSE              Apache-2.0 许可证
 ```
 
@@ -123,7 +122,6 @@ npm run dev:h5
 
 ## 相关资料
 
-- [管理后台设计规范](DESIGN.md)
 - [前后端数据同步修复说明](deliverables/前后端数据同步修复说明.md)
 - [花卉图片来源说明](docs/assets/huajianji-image-sources.md)
 
