@@ -358,7 +358,7 @@ function getList() {
   const requestVersion = ++productRequestVersion;
   listLoading.value = true;
   tableData.data = [];
-  tableData.total = 0;
+  // 加载期间保留总数，避免分页控件把当前页重置为第一页。
   loadFilterOptions();
   getFlowerProductList(productQuery())
     .then((res) => {
@@ -379,20 +379,23 @@ function pageChange(page) {
 }
 function handleSizeChange(val) {
   tableFrom.limit = val;
+  tableFrom.page = 1;
   getList();
 }
 // 删除
 function handleDelete(id, type) {
-  proxy.$modalSure(
+  return proxy.$modalSure(
     tableFrom.type === '5' ? `删除 id 为 ${id} 的商品吗？` : `将 id 为 ${id} 的商品加入回收站吗？`,
   ).then(() => {
     const deleteFlag = type == 5 ? 'delete' : 'recycle';
-    productDeleteApi(id, deleteFlag).then(() => {
+    return productDeleteApi(id, deleteFlag).then(() => {
       ElMessage.success('操作成功');
       if (tableData.data.length === 1 && tableFrom.page > 1) tableFrom.page = tableFrom.page - 1;
       getList();
       goodHeade();
     });
+  }).catch(() => {
+    // 取消/关闭确认框不执行操作；请求失败由统一请求处理器提示。
   });
 }
 function onchangeIsShow(row) {

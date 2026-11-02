@@ -80,7 +80,7 @@ public class FlowerDashboardServiceImplTest {
         stream.close();
         Assert.assertTrue(read > 0);
         String mapper = new String(bytes, 0, read, StandardCharsets.UTF_8);
-        Assert.assertTrue(mapper.contains("GROUP BY DATE_FORMAT(o.pay_time, '%m-%d')"));
+        Assert.assertTrue(mapper.contains("GROUP BY DATE_FORMAT(o.pay_time, '%Y-%m-%d')"));
         Assert.assertTrue(mapper.contains("ORDER BY MIN(o.pay_time)"));
     }
 

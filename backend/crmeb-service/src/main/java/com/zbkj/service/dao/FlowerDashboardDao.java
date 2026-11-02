@@ -13,6 +13,6 @@ public interface FlowerDashboardDao {
     List<OrderMetric> selectOrderMetrics(@Param("start") Date start, @Param("end") Date end);
     Integer countAfterSales();
     List<TrendItem> selectSalesTrend(@Param("start") Date start, @Param("end") Date end);
-    List<RankingItem> selectHotProducts(@Param("start") Date start, @Param("end") Date end);
+    List<RankingItem> selectHotProducts(@Param("start") Date start, @Param("end") Date end, @Param("sortBy") String sortBy);
     List<SlotItem> selectPopularSlots(@Param("start") Date start, @Param("end") Date end);
 }

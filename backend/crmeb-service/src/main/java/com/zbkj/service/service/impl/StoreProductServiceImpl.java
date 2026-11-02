@@ -826,16 +826,16 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
      */
     private List<String> getProductActivityList(String activityStr) {
         List<String> activityList = CollUtil.newArrayList();
-        if (activityStr.equals("0, 1, 2, 3")) {
-            activityList.add(Constants.PRODUCT_TYPE_NORMAL_STR);
-            activityList.add(Constants.PRODUCT_TYPE_SECKILL_STR);
-            activityList.add(Constants.PRODUCT_TYPE_BARGAIN_STR);
-            activityList.add(Constants.PRODUCT_TYPE_PINGTUAN_STR);
-            return activityList;
+        if (StrUtil.isBlank(activityStr)) {
+            // 未配置活动时，与商品新增/修改使用相同的默认活动设置。
+            activityStr = "0,1,2,3";
         }
         String[] split = activityStr.split(",");
         for (String s : split) {
-            Integer integer = Integer.valueOf(s);
+            if (StrUtil.isBlank(s)) {
+                continue;
+            }
+            Integer integer = Integer.valueOf(s.trim());
             if (integer.equals(Constants.PRODUCT_TYPE_NORMAL)) {
                 activityList.add(Constants.PRODUCT_TYPE_NORMAL_STR);
             }

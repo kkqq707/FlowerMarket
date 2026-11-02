@@ -31,6 +31,34 @@ import { useUserStore } from './user';
 
 // import { includeArray } from '@/utils/system.js';
 const homeName = 'Dashboard';
+
+// Flattened menu records can retain the relative child path (`dashboard`).
+// Resolve the dashboard identity before comparing it with visited/cached routes.
+function normalizeTagNavList(list) {
+  const dashboard = router.resolve({ name: 'FlowerDashboard' });
+  const aliases = new Set(router.getRoutes()
+    .filter((record) => record.redirect === dashboard.path)
+    .map((record) => record.path));
+  let dashboardAdded = false;
+  return list.reduce((tags, tag) => {
+    if (tag.name === dashboard.name || tag.path === dashboard.path || aliases.has(tag.path)) {
+      if (dashboardAdded) return tags;
+      dashboardAdded = true;
+      const resolved = router.resolve({ name: dashboard.name, query: tag.query, hash: tag.hash });
+      tags.push({
+        ...tag,
+        name: dashboard.name,
+        path: dashboard.path,
+        ...(tag.fullPath ? { fullPath: resolved.fullPath } : {}),
+        meta: { ...tag.meta, ...dashboard.meta },
+      });
+    } else {
+      tags.push(tag);
+    }
+    return tags;
+  }, []);
+}
+
 // 根据 menu 配置的权限，过滤菜单
 function filterMenu(menuList, access, lastList) {
   menuList.forEach((menu) => {
@@ -193,10 +221,7 @@ export const useMenuStore = defineStore('menu', () => {
     homeRoute.value = getHomeRoute(routes, homeName);
   }
   function setTagNavList(list) {
-    let tagList = [];
-    if (list.length) {
-      tagList = [...list];
-    }
+    const tagList = normalizeTagNavList(list);
     tagNavList.value = tagList;
     setTagNavListInLocalstorage([...tagList]);
   }
@@ -217,7 +242,7 @@ export const useMenuStore = defineStore('menu', () => {
         else {
           return;
         }
-      setTagNavListInLocalstorage([...tagNavList.value]);
+      setTagNavList(tagNavList.value);
     }
   }
   function setLocal(lang) {

@@ -18,12 +18,12 @@
         WHERE o.refund_status IN (1, 3) AND o.is_del = 0 AND o.is_system_del = 0
     </select>
     <select id="selectSalesTrend" resultType="com.zbkj.common.response.FlowerDashboardResponse$TrendItem">
-        SELECT DATE_FORMAT(o.pay_time, '%m-%d') AS label,
+        SELECT DATE_FORMAT(o.pay_time, '%Y-%m-%d') AS label,
                SUM(o.pay_price) AS amount, COUNT(1) AS order_count
         FROM eb_store_order o INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
         WHERE o.paid = 1 AND o.refund_status = 0 AND o.is_del = 0 AND o.is_system_del = 0
           AND o.pay_time &gt;= #{start} AND o.pay_time &lt; #{end}
-        GROUP BY DATE_FORMAT(o.pay_time, '%m-%d') ORDER BY MIN(o.pay_time)
+        GROUP BY DATE_FORMAT(o.pay_time, '%Y-%m-%d') ORDER BY MIN(o.pay_time)
     </select>
     <select id="selectHotProducts" resultType="com.zbkj.common.response.FlowerDashboardResponse$RankingItem">
         SELECT i.product_id, i.product_name AS name, i.image,
@@ -33,7 +33,12 @@
         INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
         WHERE o.paid = 1 AND o.refund_status = 0 AND o.is_del = 0 AND o.is_system_del = 0
           AND o.pay_time &gt;= #{start} AND o.pay_time &lt; #{end}
-        GROUP BY i.product_id, i.product_name, i.image ORDER BY quantity DESC LIMIT 5
+        GROUP BY i.product_id, i.product_name, i.image
+        <choose>
+            <when test="sortBy == 'amount'">ORDER BY amount DESC, quantity DESC, i.product_id ASC</when>
+            <otherwise>ORDER BY quantity DESC, amount DESC, i.product_id ASC</otherwise>
+        </choose>
+        LIMIT 5
     </select>
     <select id="selectPopularSlots" resultType="com.zbkj.common.response.FlowerDashboardResponse$SlotItem">
         SELECT CONCAT(DATE_FORMAT(s.start_time, '%H:%i'), '-', DATE_FORMAT(s.end_time, '%H:%i')) AS label,

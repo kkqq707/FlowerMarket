@@ -134,6 +134,8 @@ function onCurrentContextmenuClickBus(data) {
 bus.on('onCurrentContextmenuClick', onCurrentContextmenuClickBus);
 
 onMounted(() => {
+  // Repair persisted relative/redirect dashboard aliases on every page load.
+  menuStore.setTagNavList(menuStore.tagNavList);
   if (!menuStore.tagNavList.length) {
     getTagsViewRoutes();
   }

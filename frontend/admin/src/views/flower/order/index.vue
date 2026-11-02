@@ -1,6 +1,6 @@
 <template>
   <div class="divBox flower-admin-page">
-    <div class="page-heading"><div><h2>订单工作台</h2><p>按花店制作流程集中处理当天订单。</p></div></div>
+    <div class="page-heading"><div><h2>订单工作台</h2><p>按花店制作流程处理订单，查看近期履约记录。</p></div></div>
     <div class="stage-strip">
       <button v-for="item in stages" :key="item.value" :class="{ active: query.stage === item.value }" @click="selectStage(item.value)"><span>{{ item.label }}</span><b v-if="item.count !== null">{{ item.count }}</b></button>
     </div>
@@ -40,5 +40,55 @@ onMounted(() => { loadOrders(); loadCounts(); });
 </script>
 
 <style scoped lang="scss">
-.flower-admin-page{padding:20px}.page-heading{margin-bottom:16px}.page-heading h2{margin:0;color:var(--flower-deep);font-family:STSong,SimSun,serif;font-size:24px}.page-heading p{margin:7px 0 0;color:#7b8177}.stage-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:14px;overflow:hidden;border:1px solid #e8e5dc;border-radius:10px;background:#e8e5dc}.stage-strip button{display:flex;justify-content:center;gap:9px;padding:16px 8px;border:0;background:var(--flower-paper);color:#586056;cursor:pointer}.stage-strip button.active{background:var(--flower-forest);color:#fff}.stage-strip b{min-width:22px;border-radius:12px;background:#efece3;font-size:12px;line-height:22px;color:var(--flower-deep)}.toolbar{display:flex;gap:10px;margin-bottom:16px}.price{font-weight:700;color:var(--flower-accent);font-variant-numeric:tabular-nums}.pager{justify-content:flex-end;margin-top:18px}
+.flower-admin-page{--flower-number-font:Arial,'Helvetica Neue','Microsoft YaHei',sans-serif;padding:20px}.page-heading{margin-bottom:16px}.page-heading h2{margin:0;color:var(--flower-deep);font-family:STSong,SimSun,serif;font-size:24px}.page-heading p{margin:7px 0 0;color:#7b8177}.stage-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(max-content, 1fr));
+  gap: 1px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  border: 1px solid #e8e5dc;
+  border-radius: 10px;
+  background: #e8e5dc;
+  scrollbar-width: thin;
+  scrollbar-color: #b6bfae #f4f2eb;
+}
+.stage-strip button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 14px 16px;
+  border: 0;
+  background: var(--flower-paper);
+  color: #586056;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.stage-strip button.active { background: var(--flower-forest); color: #fff; }
+.stage-strip button:focus-visible { outline: 2px solid var(--flower-forest); outline-offset: -3px; }
+.stage-strip button.active:focus-visible { outline-color: #fff; }
+.stage-strip b {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: #efece3;
+  color: var(--flower-deep);
+  font-family: var(--flower-number-font);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 24px;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.stage-strip button.active b { background: rgba(255,255,255,.16); color: #fff; }
+@media (max-width: 600px) { .stage-strip button { padding: 12px; } }
+.toolbar{display:flex;gap:10px;margin-bottom:16px}.price{font-weight:700;color:var(--flower-accent);font-variant-numeric:tabular-nums}.pager{justify-content:flex-end;margin-top:18px}
 </style>

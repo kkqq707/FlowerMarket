@@ -14,7 +14,7 @@
     </view>
 
     <view class="section-head">
-      <view><text class="section-head__eyebrow">我的订单</text><text class="section-head__title">订单中心</text></view>
+      <text class="section-head__title">订单中心</text>
       <button class="section-head__link" @click="openProtected('/pages/users/order_list/index')">查看全部 <text aria-hidden="true">›</text></button>
     </view>
     <view class="order-card">
@@ -24,8 +24,8 @@
       </button>
     </view>
 
-    <view class="section-head section-head--services">
-      <view><text class="section-head__eyebrow">贴心服务</text><text class="section-head__title">花礼服务</text></view>
+    <view class="section-head">
+      <text class="section-head__title">花礼服务</text>
     </view>
     <view class="service-card">
       <button v-for="item in serviceEntries" :key="item.label" class="service-entry" @click="openProtected(item.url)">
@@ -121,9 +121,8 @@ onPullDownRefresh(refreshProfile);
 .account-hero__logout { flex:none; height:auto; margin:0; padding:0 0 7rpx; border-bottom:1rpx solid rgba(255,255,255,.5); border-radius:0; background:transparent; color:$flower-paper; font-size:23rpx; line-height:1.4; }
 .account-hero__logout::after { border:0; }
 .account-hero__image { width:132rpx; height:132rpx; flex:none; border-radius:50%; background:$flower-paper; }
-.section-head { display:flex; align-items:end; justify-content:space-between; margin:58rpx 4rpx 22rpx; }
-.section-head__eyebrow { display:block; font:17rpx $flower-serif-en; letter-spacing:3rpx; color:#7B8377; }
-.section-head__title { display:block; margin-top:8rpx; font:34rpx $flower-serif-cn; }
+.section-head { display:flex; align-items:center; justify-content:space-between; margin:36rpx 4rpx 18rpx; }
+.section-head__title { display:block; font:34rpx/1.3 $flower-serif-cn; }
 .section-head__link { margin:0; padding:0; background:transparent; color:$flower-primary; font-size:22rpx; line-height:1.8; }
 .section-head__link::after,.order-entry::after,.service-entry::after { border:0; }
 .section-head__link text { margin-left:7rpx; font-size:30rpx; }
@@ -131,7 +130,6 @@ onPullDownRefresh(refreshProfile);
 .order-entry { flex:1; min-width:0; margin:0; padding:0; display:flex; align-items:center; flex-direction:column; background:transparent; color:$flower-text; line-height:1.5; }
 .order-entry__icon { font-size:46rpx; color:$flower-primary; }
 .order-entry__label { margin-top:18rpx; font-size:22rpx; }
-.section-head--services { margin-top:64rpx; }
 .service-card { padding:0 26rpx; background:$flower-paper; border:1rpx solid #E5E5D9; }
 .service-entry { display:flex; align-items:center; width:100%; min-height:120rpx; margin:0; padding:0; border-bottom:1rpx solid #EAE9DF; border-radius:0; background:transparent; color:$flower-text; text-align:left; }
 .service-entry:last-child { border-bottom:0; }

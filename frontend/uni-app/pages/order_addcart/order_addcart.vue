@@ -245,7 +245,6 @@
           </view>
           <view class="flower-cart-recommendations">
             <view class="flower-cart-recommendations__heading">
-              <text class="flower-cart-recommendations__eyebrow">FLOWERS FOR YOU</text>
               <text class="flower-cart-recommendations__title">鲜花推荐</text>
             </view>
             <view class="flower-cart-recommendations__grid">
@@ -1306,7 +1305,7 @@ function touchStart() {
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin: 48rpx 30rpx 0;
+  margin: 32rpx 30rpx 0;
   padding: 54rpx 32rpx 48rpx;
   background: $flower-paper;
 }
@@ -1345,25 +1344,17 @@ function touchStart() {
 }
 
 .flower-cart-recommendations {
-  padding: 74rpx 30rpx 40rpx;
+  padding: 36rpx 30rpx 40rpx;
 }
 
 .flower-cart-recommendations__heading {
   display: flex;
   align-items: center;
   flex-direction: column;
-  margin-bottom: 34rpx;
-}
-
-.flower-cart-recommendations__eyebrow {
-  font-family: $flower-serif-en;
-  font-size: 18rpx;
-  letter-spacing: 4rpx;
-  color: rgba($flower-text, .52);
+  margin-bottom: 24rpx;
 }
 
 .flower-cart-recommendations__title {
-  margin-top: 8rpx;
   font-family: $flower-serif-cn;
   font-size: 34rpx;
   color: $flower-text;

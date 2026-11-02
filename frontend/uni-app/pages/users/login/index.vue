@@ -1,7 +1,9 @@
 <template>
 	<div class="login-wrapper" :data-theme="theme" :style="colorStyle">
 		<button class="login-back" aria-label="返回" @click="handleBack">
+			<!-- #ifndef MP -->
 			<text aria-hidden="true">‹</text>
+			<!-- #endif -->
 		</button>
 		<div class="shading">
 			<image class="brand-logo" :src="FLOWER_BRAND.logo" mode="aspectFit" @error="brandVisualFailed = true" />
@@ -701,7 +703,23 @@ function getUserInfo(data) {
 		padding-top: calc(var(--status-bar-height) + 30rpx);
 		background: #f5f5f5;
 	}
-	.login-wrapper .login-back { margin-left: 20rpx; }
+	.login-wrapper .login-back {
+		position: relative;
+		/* 页面内边距为30rpx，按钮左缘与花礼详情的12rpx对齐。 */
+		left: -18rpx;
+		margin-left: 0;
+		border: 0;
+		border-radius: 0;
+	}
+	.login-wrapper .login-back::before {
+		content: '';
+		display: block;
+		width: 16rpx;
+		height: 16rpx;
+		border-left: 3rpx solid currentColor;
+		border-bottom: 3rpx solid currentColor;
+		transform: rotate(45deg);
+	}
 	.login-wrapper .shading { margin-top: 165rpx; }
 	.login-wrapper .whiteBg { margin: 100rpx 20rpx 0; }
 	.login-wrapper .whiteBg .list .item .row-middle {

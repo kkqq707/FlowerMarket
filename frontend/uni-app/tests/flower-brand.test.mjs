@@ -152,7 +152,9 @@ test('admin shell and login use only local 花间集 brand assets', async () => 
   assert.match(logo, /['"]\/huajianji\/logo\.png['"]/);
   assert.doesNotMatch(logo, /getSiteLogoApi|Cookies\.get\(['"]logoInfo/);
   assert.match(login, /src=['"]\/huajianji\/wordmark-login\.png['"]/);
-  assert.match(login, /src=['"]\/huajianji\/login-bouquet-v2\.png['"]/);
+  const bouquet = login.match(/src=['"](\/huajianji\/login-bouquet[^'"]*\.png)['"]/);
+  assert.ok(bouquet, 'login bouquet must use a local brand asset');
+  assert.ok((await readFile(new URL('../../admin/public' + bouquet[1], import.meta.url))).length > 0);
   assert.doesNotMatch(login, /loginLogo\.value\s*=\s*res\.loginLogo|version\s*=\s*ref\(['"]CRMEB/i);
 });
 

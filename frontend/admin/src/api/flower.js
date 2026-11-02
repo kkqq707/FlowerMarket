@@ -30,6 +30,8 @@ export const saveDeliverySlot = (data) => request({ url: '/admin/flower/delivery
 export const setDeliverySlotEnabled = (id, enabled) =>
   request({ url: `/admin/flower/delivery/slot/${id}/enabled`, method: 'post', params: { enabled } });
 export const getFlowerDashboard = () => request({ url: '/admin/flower/dashboard', method: 'get' });
+export const getFlowerSalesTrend = (params) => request({ url: '/admin/flower/dashboard/sales-trend', method: 'get', params });
+export const getFlowerHotProducts = (params) => request({ url: '/admin/flower/dashboard/hot-products', method: 'get', params });
 export const getFlowerOrders = (params) => request({ url: '/admin/flower/order/list', method: 'get', params });
 export const getFlowerOrderDetail = (orderNo) => request({ url: `/admin/flower/order/${orderNo}`, method: 'get' });
 export const transitionFlowerOrder = (orderNo, data) =>
