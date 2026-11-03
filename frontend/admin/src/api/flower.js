@@ -33,6 +33,9 @@ export const getFlowerDashboard = () => request({ url: '/admin/flower/dashboard'
 export const getFlowerSalesTrend = (params) => request({ url: '/admin/flower/dashboard/sales-trend', method: 'get', params });
 export const getFlowerHotProducts = (params) => request({ url: '/admin/flower/dashboard/hot-products', method: 'get', params });
 export const getFlowerOrders = (params) => request({ url: '/admin/flower/order/list', method: 'get', params });
+export const getFlowerOrderSummary = (params) => request({ url: '/admin/flower/order/summary', method: 'get', params });
+export const refundFlowerOrder = (params) => request({ url: '/admin/store/order/flower/refund', method: 'get', params });
+export const refuseFlowerRefund = (params) => request({ url: '/admin/store/order/refund/refuse', method: 'get', params });
 export const getFlowerOrderDetail = (orderNo) => request({ url: `/admin/flower/order/${orderNo}`, method: 'get' });
 export const transitionFlowerOrder = (orderNo, data) =>
   request({ url: `/admin/flower/order/${orderNo}/transition`, method: 'post', data });

@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { parseJson } = require('@dcloudio/uni-cli-shared');
 
 const read = (relativePath) => readFile(new URL(relativePath, import.meta.url), 'utf8');
 
@@ -34,8 +38,11 @@ test('WeChat output configuration contains only supported window and timeout key
   assert.match(manifest, /"networkTimeout"\s*:\s*\{[\s\S]*?"connectSocket"\s*:/);
 });
 
-test('local WeChat builds use the developer-tools tourist AppID', async () => {
-  const manifest = await read('../manifest.json');
-  const weixinBlock = manifest.match(/"mp-weixin"\s*:\s*\{([\s\S]*?)\n\s*\},\n\s*"mp-alipay"/)?.[1] || '';
-  assert.match(weixinBlock, /"appid"\s*:\s*"touristappid"/);
+test('WeChat developer-tools configuration uses the AppID configured in the manifest', async () => {
+  const manifest = parseJson(await read('../manifest.json'));
+  const project = JSON.parse(await read('../project.config.json'));
+  const appid = manifest['mp-weixin'].appid;
+
+  assert.match(appid, /^wx[0-9a-f]{16}$/, 'configure a real WeChat mini-program AppID');
+  assert.equal(project.appid, appid, 'developer tools and uni-app must use the same AppID');
 });

@@ -12,7 +12,7 @@
         <thead><tr><th scope="col">日期</th><th scope="col" class="bar-column">销售额对比</th><th scope="col" class="daily-amount">销售额（元）</th><th scope="col" class="daily-orders">订单数</th></tr></thead>
         <tbody>
           <tr v-for="day in days" :key="day.date">
-            <th scope="row"><time :datetime="day.date" :aria-label="day.date">{{ day.label }}</time></th>
+            <th scope="row"><button class="day-link" :aria-label="`查看${day.date}的销售订单`" @click="$emit('select-date',day.date)"><time :datetime="day.date">{{ day.label }}</time></button></th>
             <td class="bar-column"><div class="sales-track" aria-hidden="true"><span v-if="day.amount > 0" class="sales-bar" :style="{ width: `${day.amount / maxSales * 100}%` }"></span></div></td>
             <td class="daily-amount">¥{{ money(day.amount) }}</td>
             <td class="daily-orders">{{ count(day.orderCount) }}<span class="order-unit"> 单</span></td>
@@ -27,6 +27,7 @@
 <script setup>
 import { computed } from 'vue';
 import { buildDashboardTrend } from './trend.js';
+defineEmits(['select-date']);
 
 const props = defineProps({
   records: { type: Array, default: () => [] },
@@ -49,6 +50,7 @@ const count = value => Number(value || 0).toLocaleString('zh-CN');
   font-family: Arial, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
   font-variant-numeric: lining-nums tabular-nums;
 }
+.day-link{padding:0;border:0;background:none;color:#446b35;text-decoration:none;font:inherit;cursor:pointer}.day-link:focus-visible{outline:2px solid #446b35;outline-offset:3px}
 .trend-summary { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 16px 28px; padding-bottom: 20px; }
 .trend-total > span, .trend-orders > span { display: block; margin-bottom: 8px; color: #667363; font-size: 12px; line-height: 18px; }
 .trend-total strong, .trend-orders strong { display: flex; align-items: baseline; gap: 5px; color: #243129; font-size: clamp(24px, 4cqi, 30px); font-weight: 600; line-height: 36px; white-space: nowrap; }

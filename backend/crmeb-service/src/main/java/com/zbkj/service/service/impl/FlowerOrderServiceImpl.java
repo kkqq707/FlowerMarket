@@ -214,6 +214,9 @@ public class FlowerOrderServiceImpl implements FlowerOrderService {
 
         StoreOrder order = requireStoreOrder(orderNo);
         requireActiveOrder(order);
+        if (order.getRefundStatus() != null && order.getRefundStatus() > 0) {
+            throw new CrmebException("订单正在退款或已退款，不能继续履约");
+        }
         if (targetStage == FlowerOrderStageEnum.WAIT_PRODUCTION && !Boolean.TRUE.equals(order.getPaid())) {
             throw new CrmebException("未支付订单不能接单");
         }
@@ -243,9 +246,21 @@ public class FlowerOrderServiceImpl implements FlowerOrderService {
 
     @Override
     public List<FlowerOrderAdminListResponse> adminList(FlowerOrderAdminSearchRequest request) {
-        FlowerOrderAdminSearchRequest safe = request == null ? new FlowerOrderAdminSearchRequest() : request;
+        FlowerOrderAdminSearchRequest safe = FlowerOrderSearch.normalize(request);
         PageHelper.startPage(safe.getPage(), safe.getLimit());
-        return orderExtDao.selectAdminList(trim(safe.getStage()), trim(safe.getKeyword()));
+        return orderExtDao.selectAdminList(safe);
+    }
+
+    @Override
+    public com.zbkj.common.response.FlowerOrderSummaryResponse adminSummary(FlowerOrderAdminSearchRequest request) {
+        FlowerOrderAdminSearchRequest safe=FlowerOrderSearch.normalize(request);
+        com.zbkj.common.response.FlowerOrderSummaryResponse result=orderExtDao.selectAdminSummary(safe);
+        java.util.Map<String,Long> counts=new java.util.LinkedHashMap<>();
+        for (java.util.Map<String,Object> row:orderExtDao.selectAdminStageCounts(safe,true)) {
+            counts.put(String.valueOf(row.get("stage")),((Number)row.get("quantity")).longValue());
+        }
+        result.setStageCounts(counts);
+        return result;
     }
 
     @Override
@@ -284,6 +299,16 @@ public class FlowerOrderServiceImpl implements FlowerOrderService {
         response.setCourierName(extension.getCourierName());
         response.setCourierPhone(extension.getCourierPhone());
         response.setPayPrice(order.getPayPrice());
+        response.setPaid(order.getPaid());
+        response.setCancelled(!Boolean.TRUE.equals(order.getPaid()) && (Boolean.TRUE.equals(order.getIsDel()) || Boolean.TRUE.equals(extension.getReservationReleased())));
+        response.setRefundStatus(order.getRefundStatus());
+        response.setRefundPrice(order.getRefundPrice());
+        response.setRefundReason(order.getRefundReasonWap());
+        response.setRefundExplanation(order.getRefundReasonWapExplain());
+        response.setRefundImages(order.getRefundReasonWapImg());
+        response.setCreateTime(order.getCreateTime()); response.setPayTime(order.getPayTime());
+        response.setRefundApplyTime(order.getRefundReasonTime());
+        response.setRefundCompletedTime(orderExtDao.selectRefundCompletedTime(order.getId()));
         response.setTotalNum(order.getTotalNum());
         List<StoreOrderInfo> products = storeOrderInfoService == null ? Collections.emptyList()
                 : storeOrderInfoService.getListByOrderNo(order.getOrderId());

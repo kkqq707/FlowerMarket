@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface FlowerOrderService {
+    com.zbkj.common.response.FlowerOrderSummaryResponse adminSummary(com.zbkj.common.request.flower.FlowerOrderAdminSearchRequest request);
     void requireFlowerRequest(boolean containsFlowerProducts, FlowerOrderRequest request);
     FlowerDeliveryQuoteResponse validateForCreate(FlowerOrderRequest request, UserAddress address,
                                                    Integer currentUid, Integer shippingType, BigDecimal goodsAmount);

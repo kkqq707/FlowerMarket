@@ -6,15 +6,15 @@ import java.math.BigDecimal;
 
 /** Audits and applies the explicitly listed local demo catalog prices. */
 public class LocalMarketPricing {
-    // 2026-11-02 local demo retail price list. References/rationale: flower-market-pricing.md.
+    // 2026-11-03 user-approved affordable demo price list. See flower-affordable-pricing.md.
     // Each row: standard SKU, larger SKU (zero for single-SKU products).
     static final int[][] PRICES={
-        {129,0},{128,0},{159,0},{169,0},{189,0},{179,0},
-        {199,0},{239,0},{239,0},{159,0},{269,0},{299,0},
-        {78,118},{159,209},{199,269},{99,139},{128,168},{169,219},
-        {99,139},{189,249},{78,118},{148,198},{99,139},{139,189},
-        {139,189},{118,158},{179,239},{199,259},{269,339},{179,229},
-        {199,259},{229,289},{299,369},{259,329},{139,189},{88,128}
+        {39,0},{39,0},{49,0},{49,0},{59,0},{59,0},
+        {69,0},{79,0},{69,0},{49,0},{89,0},{99,0},
+        {29,39},{49,69},{79,99},{39,59},{39,59},{59,79},
+        {39,59},{69,89},{29,39},{49,69},{39,59},{49,69},
+        {49,69},{39,59},{69,89},{79,99},{139,169},{119,149},
+        {129,159},{79,99},{89,99},{79,99},{49,69},{29,39}
     };
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {

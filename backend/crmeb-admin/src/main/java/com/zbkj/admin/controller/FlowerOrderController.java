@@ -28,6 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "花店后台——订单履约")
 public class FlowerOrderController {
 
+    @PreAuthorize("hasAuthority('admin:flower:order:list')")
+    @GetMapping("/summary")
+    public CommonResult<com.zbkj.common.response.FlowerOrderSummaryResponse> summary(@Validated FlowerOrderAdminSearchRequest request) {
+        return CommonResult.success(flowerOrderService.adminSummary(request));
+    }
+
     @Autowired
     private FlowerOrderService flowerOrderService;
 

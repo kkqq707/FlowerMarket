@@ -12,10 +12,12 @@ public class FlowerDashboardResponse {
     private BigDecimal todaySales;
     private Integer todayOrders;
     private BigDecimal averageOrderValue;
+    private BigDecimal refundAmount;
     private Integer waitAcceptCount;
     private Integer waitProductionCount;
     private Integer waitDeliveryCount;
     private Integer afterSaleCount;
+    /** Null when no completed delivery has both actual and promised timestamps. */
     private BigDecimal onTimeRate;
     private List<TrendItem> salesTrend;
     private List<RankingItem> hotProducts;

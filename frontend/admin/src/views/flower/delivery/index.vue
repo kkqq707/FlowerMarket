@@ -1,8 +1,5 @@
 <template>
   <div class="divBox flower-admin-page">
-    <div class="page-heading">
-      <div><h2>配送设置</h2><p>管理同城配送范围、费用和每日可预约时段。</p></div>
-    </div>
     <el-card shadow="never">
       <el-tabs v-model="activeTab">
         <el-tab-pane label="配送区域" name="zones">
@@ -77,5 +74,5 @@ onMounted(() => { loadZones(); loadSlots(); });
 </script>
 
 <style scoped lang="scss">
-.flower-admin-page{padding:20px}.page-heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}.page-heading h2{margin:0;color:var(--flower-deep);font-family:STSong,SimSun,serif;font-size:24px}.page-heading p{margin:7px 0 0;color:#7b8177}.toolbar{display:flex;justify-content:flex-end;margin-bottom:14px}.pager{justify-content:flex-end;margin-top:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.full{color:var(--flower-accent);font-weight:600}
+.flower-admin-page{padding:20px}.page-heading{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}.page-heading h2{margin:0;color:var(--flower-deep);font-family:STSong,SimSun,serif;font-size:24px}.page-heading p{margin:7px 0 0;color:#7b8177}.toolbar{display:flex;flex-wrap:wrap;justify-content:flex-start;margin-bottom:14px}.pager{justify-content:flex-end;margin-top:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.full{color:var(--flower-accent);font-weight:600}
 </style>

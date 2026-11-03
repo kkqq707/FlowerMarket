@@ -15,7 +15,25 @@
     <select id="countAfterSales" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM eb_store_order o
         INNER JOIN eb_flower_order_ext e ON e.order_id = o.order_id
-        WHERE o.refund_status IN (1, 3) AND o.is_del = 0 AND o.is_system_del = 0
+        WHERE o.refund_status IN (1, 3) AND o.is_system_del = 0
+    </select>
+    <select id="countCreatedOrders" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM eb_store_order o INNER JOIN eb_flower_order_ext e ON e.order_id=o.order_id
+        WHERE o.is_system_del=0 AND o.create_time &gt;= #{start} AND o.create_time &lt; #{end}
+    </select>
+    <select id="selectWorkbenchCounts" resultType="java.util.HashMap">
+        SELECT COALESCE(SUM(e.current_stage='WAIT_ACCEPT'),0) AS waitAccept,
+               COALESCE(SUM(e.current_stage IN ('WAIT_PRODUCTION','PRODUCING')),0) AS waitProduction,
+               COALESCE(SUM(e.current_stage IN ('WAIT_DELIVERY','DELIVERING')),0) AS waitDelivery
+        FROM eb_store_order o INNER JOIN eb_flower_order_ext e ON e.order_id=o.order_id
+        WHERE o.paid=1 AND o.refund_status=0 AND o.is_del=0 AND o.is_system_del=0
+    </select>
+    <select id="selectRefundAmount" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(o.refund_price),0) FROM eb_store_order o
+        INNER JOIN eb_flower_order_ext e ON e.order_id=o.order_id
+        INNER JOIN (SELECT oid,MAX(create_time) AS completed_time FROM eb_store_order_status
+                    WHERE change_type='refund_price' GROUP BY oid) r ON r.oid=o.id
+        WHERE o.refund_status=2 AND o.is_system_del=0 AND r.completed_time &gt;= #{start} AND r.completed_time &lt; #{end}
     </select>
     <select id="selectSalesTrend" resultType="com.zbkj.common.response.FlowerDashboardResponse$TrendItem">
         SELECT DATE_FORMAT(o.pay_time, '%Y-%m-%d') AS label,

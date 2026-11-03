@@ -1,8 +1,7 @@
 <template>
   <div class="flower-care-admin">
-    <header class="page-heading"><div><h2>养花指南</h2><p>整理收到花之后的养护方法，已发布内容会出现在小程序。</p></div><el-button type="primary" v-hasPermi="['admin:flower:care:save']" @click="openEditor()">写一篇指南</el-button></header>
     <el-card shadow="never">
-      <div class="toolbar"><el-input v-model="keyword" placeholder="搜索文章标题" clearable @keyup.enter="load"/><el-button @click="load">搜索</el-button></div>
+      <div class="toolbar"><el-input v-model="keyword" placeholder="搜索文章标题" clearable @keyup.enter="load"/><el-button @click="load">搜索</el-button><el-button type="primary" v-hasPermi="['admin:flower:care:save']" @click="openEditor()">写一篇指南</el-button></div>
       <el-table :data="articles" v-loading="loading" empty-text="还没有养花文章，先写一篇醒花或换水指南吧">
         <el-table-column label="封面" width="100"><template #default="{row}"><el-image :src="row.imageInput" class="cover" fit="cover"/></template></el-table-column>
         <el-table-column prop="title" label="标题" min-width="210"/>
@@ -36,5 +35,5 @@ onMounted(load);
 </script>
 
 <style scoped>
-.flower-care-admin{padding:20px;color:#27352b}.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}.page-heading h2{font-family:STSong,SimSun,serif;font-size:26px;margin:0}.page-heading p{color:#667363;margin:8px 0 0}.toolbar{display:flex;gap:10px;margin-bottom:18px;max-width:370px}.cover{width:58px;height:58px}.cover-field{display:flex;align-items:center;gap:14px}.preview{width:90px;height:90px}.editor-form :deep(.w-e-text-container){min-height:220px}.publish-note{margin-left:12px;color:#667363;font-size:12px}.pager{justify-content:flex-end;margin-top:18px}@media(max-width:650px){.page-heading{align-items:flex-start;flex-direction:column}}
+.flower-care-admin{padding:20px;color:#27352b}.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}.page-heading h2{font-family:STSong,SimSun,serif;font-size:26px;margin:0}.page-heading p{color:#667363;margin:8px 0 0}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px}.toolbar>.el-input{flex:0 1 360px;max-width:100%}.toolbar>.el-button{margin-left:0}.cover{width:58px;height:58px}.cover-field{display:flex;align-items:center;gap:14px}.preview{width:90px;height:90px}.editor-form :deep(.w-e-text-container){min-height:220px}.publish-note{margin-left:12px;color:#667363;font-size:12px}.pager{justify-content:flex-end;margin-top:18px}@media(max-width:650px){.page-heading{align-items:flex-start;flex-direction:column}}
 </style>

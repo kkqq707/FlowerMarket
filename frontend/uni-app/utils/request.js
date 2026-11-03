@@ -20,6 +20,7 @@ import {
 	checkLogin
 } from '../libs/login';
 import { useAppStore } from "@/store/app.js";
+import { normalizeFlowerImages } from './flower-images.js';
 
 // 在请求函数内按需获取 store 实例（Pinia 要求在 install 之后调用，
 // 这里延迟到调用时获取，避免模块加载顺序问题）
@@ -59,7 +60,7 @@ function baseRequest(url, method, data, {
 			success: (res) => {
 				// 网关错误/服务端返回非 JSON（如 502 HTML）时 res.data 可能为字符串或 undefined，
 				// 直接访问 res.data.code 会抛异常且 Promise 永远 pending，这里先做兜底。
-				const data = res.data;
+				const data = normalizeFlowerImages(res.data);
 				if (res.statusCode < 200 || res.statusCode >= 300) {
 					let msg = `请求异常(${res.statusCode})`;
 					if (res.statusCode === 404) msg = '请求的资源不存在';

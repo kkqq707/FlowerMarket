@@ -35,6 +35,17 @@ public class FlowerOrderDetailResponse {
     private Date completedTime;
     private BigDecimal payPrice;
     private Integer totalNum;
+    private Boolean paid;
+    private Boolean cancelled;
+    private Integer refundStatus;
+    private BigDecimal refundPrice;
+    private String refundReason;
+    private String refundExplanation;
+    private String refundImages;
+    private Date createTime;
+    private Date payTime;
+    private Date refundApplyTime;
+    private Date refundCompletedTime;
     private List<StoreOrderInfo> products;
     private List<FlowerOrderProgress> progressList;
 }

@@ -1,6 +1,5 @@
 <template>
   <div class="flower-material-page">
-    <header class="page-heading"><div><h2>花材库存</h2><p>按批次记录鲜度。订单按交付日期优先占用临近到期的合格花材。</p></div><el-button @click="refresh">刷新库存</el-button></header>
     <div class="summary">
       <div><strong>{{ materials.length }}</strong><span>花材品种</span></div>
       <div><strong>{{ availableTotal }}</strong><span>可分配数量</span></div>
@@ -10,7 +9,7 @@
     <el-card shadow="never">
       <el-tabs v-model="activeTab">
         <el-tab-pane label="花材资料" name="materials">
-          <div class="toolbar"><el-button type="primary" v-hasPermi="['admin:flower:material:save']" @click="openMaterial()">新增花材</el-button></div>
+          <div class="toolbar"><el-button type="primary" v-hasPermi="['admin:flower:material:save']" @click="openMaterial()">新增花材</el-button><el-button @click="refresh">刷新库存</el-button></div>
           <el-table :data="materials" v-loading="loading" empty-text="暂无花材，请先登记常用花材">
             <el-table-column prop="name" label="花材" min-width="130" />
             <el-table-column prop="unit" label="单位" width="75" />
@@ -114,5 +113,5 @@ onMounted(async()=>{await refresh();if(productId.value)loadRecipe();});
   color: #35402f;
 }
 .summary span { font-size: 13px; line-height: 20px; color: #667363; }
-.toolbar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:15px}.recipe-search{justify-content:flex-start;margin-top:18px}.recipe-edit{max-width:680px;padding:20px;background:#f7f4ec}.recipe-heading{display:flex;justify-content:space-between;margin-bottom:16px}.recipe-heading span{color:#667363}.recipe-line{display:flex;align-items:center;gap:12px;margin-bottom:12px}.recipe-line .el-select{width:240px}.recipe-line span{font-size:12px;white-space:nowrap}.recipe-actions{display:flex;justify-content:space-between;margin-top:20px}@media(max-width:850px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.page-heading{align-items:flex-start;flex-direction:column}}@media(max-width:540px){.summary{gap:10px}.summary>div{padding:16px}.recipe-line{flex-wrap:wrap}}
+.toolbar{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:10px;margin-bottom:15px}.recipe-search{justify-content:flex-start;margin-top:18px}.recipe-edit{max-width:680px;padding:20px;background:#f7f4ec}.recipe-heading{display:flex;justify-content:space-between;margin-bottom:16px}.recipe-heading span{color:#667363}.recipe-line{display:flex;align-items:center;gap:12px;margin-bottom:12px}.recipe-line .el-select{width:240px}.recipe-line span{font-size:12px;white-space:nowrap}.recipe-actions{display:flex;justify-content:space-between;margin-top:20px}@media(max-width:850px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.page-heading{align-items:flex-start;flex-direction:column}}@media(max-width:540px){.summary{gap:10px}.summary>div{padding:16px}.recipe-line{flex-wrap:wrap}}
 </style>

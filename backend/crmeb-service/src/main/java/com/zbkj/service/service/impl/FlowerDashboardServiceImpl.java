@@ -67,14 +67,17 @@ public class FlowerDashboardServiceImpl implements FlowerDashboardService {
 
         FlowerDashboardResponse response = new FlowerDashboardResponse();
         response.setTodaySales(money(sales));
-        response.setTodayOrders(orders);
+        response.setTodayOrders(zero(dashboardDao.countCreatedOrders(start,end)));
+        BigDecimal refunds=dashboardDao.selectRefundAmount(start,end);
+        response.setRefundAmount(money(refunds == null ? BigDecimal.ZERO : refunds));
         response.setAverageOrderValue(orders == 0 ? money(BigDecimal.ZERO)
                 : money(sales.divide(BigDecimal.valueOf(orders), 2, RoundingMode.HALF_UP)));
-        response.setWaitAcceptCount(waitAccept);
-        response.setWaitProductionCount(waitProduction);
-        response.setWaitDeliveryCount(waitDelivery);
+        java.util.Map<String,Object> workbench=dashboardDao.selectWorkbenchCounts();
+        response.setWaitAcceptCount(workbenchCount(workbench,"waitAccept"));
+        response.setWaitProductionCount(workbenchCount(workbench,"waitProduction"));
+        response.setWaitDeliveryCount(workbenchCount(workbench,"waitDelivery"));
         response.setAfterSaleCount(zero(dashboardDao.countAfterSales()));
-        response.setOnTimeRate(completed == 0 ? money(BigDecimal.ZERO)
+        response.setOnTimeRate(completed == 0 ? null
                 : money(BigDecimal.valueOf(onTime * 100L).divide(BigDecimal.valueOf(completed), 2, RoundingMode.HALF_UP)));
         response.setSalesTrend(safe(dashboardDao.selectSalesTrend(trendStart, end)));
         response.setHotProducts(safe(dashboardDao.selectHotProducts(start, end, "quantity")));
@@ -123,5 +126,6 @@ public class FlowerDashboardServiceImpl implements FlowerDashboardService {
 
     private BigDecimal money(BigDecimal value) { return value.setScale(2, RoundingMode.HALF_UP); }
     private int zero(Integer value) { return value == null ? 0 : value; }
+    private int workbenchCount(java.util.Map<String,Object> counts,String key) { return counts == null || counts.get(key)==null ? 0 : ((Number)counts.get(key)).intValue(); }
     private <T> List<T> safe(List<T> value) { return value == null ? Collections.emptyList() : value; }
 }

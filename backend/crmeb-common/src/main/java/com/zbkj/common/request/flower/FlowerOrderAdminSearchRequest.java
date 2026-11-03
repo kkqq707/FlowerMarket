@@ -11,4 +11,9 @@ import lombok.EqualsAndHashCode;
 public class FlowerOrderAdminSearchRequest extends PageParamRequest {
     private String stage;
     private String keyword;
+    private String timeType;
+    private String startDate;
+    private String endDate;
+    private String refundState;
+    private Boolean salesOnly;
 }

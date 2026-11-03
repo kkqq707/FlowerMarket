@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import com.zbkj.common.request.flower.FlowerOrderAdminSearchRequest;
+import com.zbkj.common.response.FlowerOrderSummaryResponse;
 
 public interface FlowerOrderExtDao extends BaseMapper<FlowerOrderExt> {
     FlowerOrderExt selectByOrderId(@Param("orderId") String orderId);
@@ -19,6 +22,9 @@ public interface FlowerOrderExtDao extends BaseMapper<FlowerOrderExt> {
     List<FlowerOrderExt> findExpiredReservations(@Param("now") Date now);
     int markReservationReleased(@Param("orderId") String orderId);
     int markPaidStage(@Param("orderId") String orderId);
-    List<FlowerOrderAdminListResponse> selectAdminList(@Param("stage") String stage,
-                                                       @Param("keyword") String keyword);
+    List<FlowerOrderAdminListResponse> selectAdminList(@Param("filter") FlowerOrderAdminSearchRequest filter);
+    FlowerOrderSummaryResponse selectAdminSummary(@Param("filter") FlowerOrderAdminSearchRequest filter);
+    List<Map<String, Object>> selectAdminStageCounts(@Param("filter") FlowerOrderAdminSearchRequest filter,
+                                                    @Param("ignoreStage") boolean ignoreStage);
+    Date selectRefundCompletedTime(@Param("orderId") Integer orderId);
 }

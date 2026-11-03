@@ -13,7 +13,10 @@ import uni from '@dcloudio/vite-plugin-uni';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
-const staticRoot = resolve(process.cwd(), 'static');
+// uni-app's asset compiler compares absolute filenames against UNI_INPUT_DIR.
+// A relative input directory produces hashed URLs without emitting the files.
+process.env.UNI_INPUT_DIR = resolve(process.env.UNI_INPUT_DIR || process.cwd());
+const staticRoot = resolve(process.env.UNI_INPUT_DIR, 'static');
 
 function staticFiles(directory) {
 	return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

@@ -36,30 +36,102 @@
         SET current_stage = 'WAIT_ACCEPT', update_time = NOW()
         WHERE order_id = #{orderId} AND current_stage = 'WAIT_PAY'
     </update>
-    <select id="selectAdminList" resultType="com.zbkj.common.response.FlowerOrderAdminListResponse">
-        SELECT ext.order_id AS order_no,
-               ext.current_stage,
-               ext.recipient_name,
-               ext.recipient_phone,
-               ext.delivery_address_snapshot AS delivery_address,
-               ext.delivery_date,
-               ext.slot_id,
-               original_order.pay_price,
-               original_order.total_num,
-               original_order.paid,
-               original_order.refund_status,
-               original_order.create_time
+    <sql id="adminStage">
+        CASE WHEN original_order.paid=0 AND (original_order.is_del=1 OR ext.reservation_released=1) THEN 'CANCELLED'
+             WHEN original_order.refund_status=2 THEN 'CLOSED'
+             WHEN original_order.paid=0 THEN 'WAIT_PAY' ELSE ext.current_stage END
+    </sql>
+    <sql id="adminFrom">
         FROM eb_flower_order_ext ext
-        INNER JOIN eb_store_order original_order ON original_order.order_id = ext.order_id
-        WHERE original_order.is_system_del = 0
-        <if test="stage != null and stage != ''">
-            AND ext.current_stage = #{stage}
+        INNER JOIN eb_store_order original_order ON original_order.order_id=ext.order_id
+        LEFT JOIN (SELECT oid,MAX(create_time) AS completed_time FROM eb_store_order_status
+                   WHERE change_type='refund_price' GROUP BY oid) refund_log ON refund_log.oid=original_order.id
+    </sql>
+    <sql id="adminFilters">
+        WHERE original_order.is_system_del=0
+        <if test="filter.salesOnly != null and filter.salesOnly">
+            AND original_order.paid=1 AND original_order.refund_status=0 AND original_order.is_del=0
         </if>
-        <if test="keyword != null and keyword != ''">
-            AND (ext.order_id LIKE CONCAT('%', #{keyword}, '%')
-                 OR ext.recipient_name LIKE CONCAT('%', #{keyword}, '%')
-                 OR ext.recipient_phone LIKE CONCAT('%', #{keyword}, '%'))
+        <if test="filter.stage != null and filter.stage != '' and (!_parameter.containsKey('ignoreStage') or !ignoreStage)">
+            <choose>
+                <when test="filter.stage == 'AFTER_SALE'">AND original_order.refund_status IN (1,3)</when>
+                <when test="filter.stage == 'PRODUCTION'">AND ext.current_stage IN ('WAIT_PRODUCTION','PRODUCING') AND original_order.refund_status=0 AND original_order.paid=1 AND original_order.is_del=0</when>
+                <when test="filter.stage == 'DELIVERY'">AND ext.current_stage IN ('WAIT_DELIVERY','DELIVERING') AND original_order.refund_status=0 AND original_order.paid=1 AND original_order.is_del=0</when>
+                <otherwise>
+                    AND (<include refid="adminStage"/>)=#{filter.stage}
+                    <if test="filter.stage == 'COMPLETED' or filter.stage == 'CANCELLED'">AND original_order.refund_status NOT IN (1,3)</if>
+                    <if test="filter.stage != 'WAIT_PAY' and filter.stage != 'CANCELLED' and filter.stage != 'CLOSED' and filter.stage != 'COMPLETED'">
+                        AND original_order.refund_status=0
+                    </if>
+                </otherwise>
+            </choose>
         </if>
-        ORDER BY ext.delivery_date ASC, original_order.create_time DESC
+        <if test="filter.refundState != null and filter.refundState != ''">
+            <choose>
+                <when test="filter.refundState == 'none'">AND original_order.refund_status=0</when>
+                <when test="filter.refundState == 'pending'">AND original_order.refund_status IN (1,3)</when>
+                <when test="filter.refundState == 'partial'">AND original_order.refund_status=2 AND original_order.refund_price &lt; original_order.pay_price</when>
+                <when test="filter.refundState == 'done'">AND original_order.refund_status=2</when>
+            </choose>
+        </if>
+        <if test="filter.keyword != null and filter.keyword != ''">
+            AND (ext.order_id LIKE CONCAT('%',#{filter.keyword},'%')
+                OR ext.recipient_name LIKE CONCAT('%',#{filter.keyword},'%')
+                OR ext.recipient_phone LIKE CONCAT('%',#{filter.keyword},'%')
+                OR original_order.real_name LIKE CONCAT('%',#{filter.keyword},'%'))
+        </if>
+        <if test="filter.startDate != null and filter.startDate != ''">
+            <choose>
+                <when test="filter.timeType == 'paid'">
+                    AND original_order.paid=1 AND original_order.pay_time &gt;= #{filter.startDate}
+                    AND original_order.pay_time &lt; DATE_ADD(#{filter.endDate}, INTERVAL 1 DAY)
+                </when>
+                <when test="filter.timeType == 'refund'">
+                    AND ((original_order.refund_reason_time &gt;= #{filter.startDate} AND original_order.refund_reason_time &lt; DATE_ADD(#{filter.endDate}, INTERVAL 1 DAY))
+                      OR (original_order.refund_status=2 AND refund_log.completed_time &gt;= #{filter.startDate} AND refund_log.completed_time &lt; DATE_ADD(#{filter.endDate}, INTERVAL 1 DAY)))
+                </when>
+                <when test="filter.timeType == 'refunded'">
+                    AND original_order.refund_status=2 AND refund_log.completed_time &gt;= #{filter.startDate}
+                    AND refund_log.completed_time &lt; DATE_ADD(#{filter.endDate}, INTERVAL 1 DAY)
+                </when>
+                <otherwise>
+                    AND original_order.create_time &gt;= #{filter.startDate}
+                    AND original_order.create_time &lt; DATE_ADD(#{filter.endDate}, INTERVAL 1 DAY)
+                </otherwise>
+            </choose>
+        </if>
+        <if test="filter.timeType == 'refund'">AND original_order.refund_status IN (1,2,3)</if>
+        <if test="filter.timeType == 'refunded'">AND original_order.refund_status=2</if>
+        <if test="filter.timeType == 'paid'">AND original_order.paid=1</if>
+    </sql>
+    <select id="selectAdminList" resultType="com.zbkj.common.response.FlowerOrderAdminListResponse">
+        SELECT ext.order_id AS order_no,ext.current_stage,ext.recipient_name,ext.recipient_phone,
+               ext.delivery_address_snapshot AS delivery_address,ext.delivery_date,ext.slot_id,
+               original_order.pay_price,original_order.total_price,original_order.total_num,original_order.paid,
+               original_order.refund_status,original_order.refund_price,original_order.create_time,original_order.pay_time,
+               original_order.refund_reason_time AS refund_apply_time,refund_log.completed_time AS refund_completed_time,
+               original_order.refund_reason_wap AS refund_reason,(<include refid="adminStage"/>) AS order_state,
+               product.product_name,product.image AS product_image
+        <include refid="adminFrom"/>
+        LEFT JOIN (SELECT order_id,product_name,image,ROW_NUMBER() OVER(PARTITION BY order_id ORDER BY id) AS item_rank
+                   FROM eb_store_order_info) product ON product.order_id=original_order.id AND product.item_rank=1
+        <include refid="adminFilters"/>
+        ORDER BY original_order.create_time DESC,original_order.id DESC
+    </select>
+    <select id="selectAdminSummary" resultType="com.zbkj.common.response.FlowerOrderSummaryResponse">
+        SELECT COUNT(*) AS order_count,COALESCE(SUM(original_order.paid=1),0) AS paid_count,
+          COALESCE(SUM(CASE WHEN original_order.paid=1 THEN original_order.pay_price ELSE 0 END),0) AS paid_amount,
+          COALESCE(SUM(CASE WHEN original_order.refund_status IN (1,3) THEN original_order.refund_price ELSE 0 END),0) AS pending_refund_amount,
+          COALESCE(SUM(CASE WHEN original_order.refund_status=2 THEN original_order.refund_price ELSE 0 END),0) AS refunded_amount
+        <include refid="adminFrom"/><include refid="adminFilters"/>
+    </select>
+    <select id="selectAdminStageCounts" resultType="java.util.HashMap">
+        SELECT CASE WHEN original_order.refund_status IN (1,3) THEN 'AFTER_SALE'
+                    ELSE (<include refid="adminStage"/>) END AS stage,COUNT(*) AS quantity
+        <include refid="adminFrom"/><include refid="adminFilters"/>
+        GROUP BY stage
+    </select>
+    <select id="selectRefundCompletedTime" resultType="java.util.Date">
+        SELECT MAX(create_time) FROM eb_store_order_status WHERE oid=#{orderId} AND change_type='refund_price'
     </select>
 </mapper>

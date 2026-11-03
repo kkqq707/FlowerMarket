@@ -36,6 +36,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FlowerOrderWorkflowServiceImplTest {
 
     @Test
+    public void refundingOrRefundedOrdersCannotContinueProduction() {
+        for (int status:new int[]{1,2,3}) {
+            WorkflowFixture fixture=new WorkflowFixture(FlowerOrderStageEnum.WAIT_PRODUCTION,true);
+            fixture.order.setRefundStatus(status);
+            assertCrmebException(()->fixture.transition(FlowerOrderStageEnum.PRODUCING,"开始制作","","",""),"订单正在退款或已退款，不能继续履约");
+            Assert.assertEquals(0,fixture.stageUpdateCount.get());
+        }
+    }
+
+    @Test
     public void completeSevenStageWorkflowLocksAndPersistsEveryTransition() {
         WorkflowFixture fixture = new WorkflowFixture(FlowerOrderStageEnum.WAIT_PAY, true);
         fixture.progress.add(progress(FlowerOrderStageEnum.WAIT_PAY, "", "订单创建"));

@@ -27,6 +27,9 @@ public class FlowerDashboardRangeTest {
                 if ("selectSalesTrend".equals(method.getName())) return Collections.singletonList(trend);
                 if ("selectHotProducts".equals(method.getName())) return Collections.singletonList(ranking);
                 if ("countAfterSales".equals(method.getName())) return 0;
+                if ("countCreatedOrders".equals(method.getName())) return 0;
+                if ("selectWorkbenchCounts".equals(method.getName())) return Collections.emptyMap();
+                if ("selectRefundAmount".equals(method.getName())) return BigDecimal.ZERO;
                 return Collections.emptyList();
             });
     // UTC still says Jan 31; Shanghai has entered Feb 1.
@@ -93,9 +96,9 @@ public class FlowerDashboardRangeTest {
     public void defaultDashboardKeepsTodayMetricsSevenDayTrendAndQuantityRanking() {
         service.today();
         assertBounds(0, "selectOrderMetrics", "2026-01-31T16:00:00Z", "2026-02-01T16:00:00Z");
-        assertBounds(2, "selectSalesTrend", "2026-01-25T16:00:00Z", "2026-02-01T16:00:00Z");
-        assertBounds(3, "selectHotProducts", "2026-01-31T16:00:00Z", "2026-02-01T16:00:00Z");
-        Assert.assertEquals("quantity", ((Object[]) calls.get(3)[1])[2]);
+        assertBounds(5, "selectSalesTrend", "2026-01-25T16:00:00Z", "2026-02-01T16:00:00Z");
+        assertBounds(6, "selectHotProducts", "2026-01-31T16:00:00Z", "2026-02-01T16:00:00Z");
+        Assert.assertEquals("quantity", ((Object[]) calls.get(6)[1])[2]);
     }
 
     private void reject(Runnable operation, String message) {

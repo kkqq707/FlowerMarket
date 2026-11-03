@@ -35,13 +35,14 @@ public class FlowerDashboardServiceImplTest {
         FlowerDashboardResponse result = new FlowerDashboardServiceImpl(dao, clock).today();
 
         Assert.assertEquals(new BigDecimal("560.00"), result.getTodaySales());
-        Assert.assertEquals(Integer.valueOf(4), result.getTodayOrders());
+        Assert.assertEquals(Integer.valueOf(5), result.getTodayOrders());
         Assert.assertEquals(new BigDecimal("140.00"), result.getAverageOrderValue());
         Assert.assertEquals(Integer.valueOf(1), result.getWaitAcceptCount());
         Assert.assertEquals(Integer.valueOf(1), result.getWaitProductionCount());
         Assert.assertEquals(Integer.valueOf(0), result.getWaitDeliveryCount());
         Assert.assertEquals(Integer.valueOf(3), result.getAfterSaleCount());
         Assert.assertEquals(new BigDecimal("50.00"), result.getOnTimeRate());
+        Assert.assertEquals(new BigDecimal("28.00"), result.getRefundAmount());
     }
 
     @Test
@@ -53,10 +54,32 @@ public class FlowerDashboardServiceImplTest {
 
         Assert.assertEquals(BigDecimal.ZERO.setScale(2), result.getTodaySales());
         Assert.assertEquals(BigDecimal.ZERO.setScale(2), result.getAverageOrderValue());
-        Assert.assertEquals(BigDecimal.ZERO.setScale(2), result.getOnTimeRate());
+        Assert.assertNull(result.getOnTimeRate());
         Assert.assertTrue(result.getSalesTrend().isEmpty());
         Assert.assertTrue(result.getHotProducts().isEmpty());
         Assert.assertTrue(result.getPopularSlots().isEmpty());
+    }
+
+    @Test
+    public void pendingOrIncompleteDeliveryRecordsHaveNoOnTimeRate() {
+        OrderMetric pending = metric("88.00", 0, "WAIT_ACCEPT", null, null);
+        OrderMetric missingTime = metric("168.00", 0, "COMPLETED", null, null);
+        FlowerDashboardResponse result = new FlowerDashboardServiceImpl(
+                daoWith(Arrays.asList(pending, missingTime), 0),
+                Clock.fixed(Instant.parse("2026-09-22T04:00:00Z"), ZoneId.of("Asia/Shanghai"))).today();
+        Assert.assertNull(result.getOnTimeRate());
+        Assert.assertEquals(Integer.valueOf(2), result.getTodayOrders());
+    }
+
+    @Test
+    public void completedLateDeliveryStillHasAnActualZeroPercentRate() {
+        OrderMetric late = metric("168.00", 0, "COMPLETED",
+                Date.from(Instant.parse("2026-09-22T09:00:00Z")),
+                Date.from(Instant.parse("2026-09-22T09:10:00Z")));
+        FlowerDashboardResponse result = new FlowerDashboardServiceImpl(
+                daoWith(Collections.singletonList(late), 0),
+                Clock.fixed(Instant.parse("2026-09-22T04:00:00Z"), ZoneId.of("Asia/Shanghai"))).today();
+        Assert.assertEquals(new BigDecimal("0.00"), result.getOnTimeRate());
     }
 
     @Test
@@ -93,6 +116,15 @@ public class FlowerDashboardServiceImplTest {
         return (FlowerDashboardDao) Proxy.newProxyInstance(FlowerDashboardDao.class.getClassLoader(),
                 new Class[]{FlowerDashboardDao.class}, (proxy, method, args) -> {
                     if ("selectOrderMetrics".equals(method.getName())) return orders;
+                    if ("countCreatedOrders".equals(method.getName())) return orders.size();
+                    if ("selectRefundAmount".equals(method.getName())) return new BigDecimal("28.00");
+                    if ("selectWorkbenchCounts".equals(method.getName())) {
+                        java.util.Map<String,Object> counts=new java.util.HashMap<>();
+                        counts.put("waitAccept",orders.stream().filter(o->"WAIT_ACCEPT".equals(o.getCurrentStage()) && o.getRefundStatus()==0).count());
+                        counts.put("waitProduction",orders.stream().filter(o->java.util.Arrays.asList("WAIT_PRODUCTION","PRODUCING").contains(o.getCurrentStage()) && o.getRefundStatus()==0).count());
+                        counts.put("waitDelivery",0);
+                        return counts;
+                    }
                     if ("countAfterSales".equals(method.getName())) return afterSales;
                     if (java.util.List.class.equals(method.getReturnType())) return Collections.emptyList();
                     if (Integer.class.equals(method.getReturnType()) || int.class.equals(method.getReturnType())) return 0;
